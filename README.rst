@@ -58,7 +58,7 @@ Retrieving historical data.
     df = c.fetch_google_trends(kw_list=["bitcoin"])  # Dataframe with trends.
     df.head()
 
-.. image:: assets/trends.png
+.. image:: https://raw.githubusercontent.com/im-n1/karpet/master/assets/trends.png
 
 And with a few lines of code you can get a chart
 
