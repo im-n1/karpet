@@ -1,4 +1,4 @@
-.. image:: logo.png
+.. image:: https://raw.githubusercontent.com/im-n1/karpet/master/assets/logo.png
    :align: center
 
 
@@ -50,7 +50,7 @@ Retrieving historical data.
     df = c.fetch_crypto_historical_data(coin="bitcoin")  # Dataframe with historical data
     df.head()
 
-.. image:: assets/historical_data.png
+.. image:: https://raw.githubusercontent.com/im-n1/karpet/master/assets/historical_data.png
 
 .. code-block::
 
@@ -67,7 +67,7 @@ And with a few lines of code you can get a chart
    df = df.set_index("date")
    df.plot()
 
-.. image:: assets/trends_chart.png
+.. image:: https://raw.githubusercontent.com/im-n1/karpet/master/assets/trends_chart.png
 
 Credits
 -------
