@@ -29,6 +29,12 @@ Library uses a few nifty dependencies and is Python 3.6+ only:
 Usage
 -----
 
+Import the library class first.
+
+.. code-block::
+
+   from karpet import Karpet
+
 Symbol (ticker) -> coninmarketcap.com URL slug conversion.
 
 .. code-block::

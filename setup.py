@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 
 import setuptools
-from carpet import __version__, __description__
+from karpet import __version__, __description__
 
 
 # Long description
-with open("description.rst", "r") as f:
+with open("README.rst", "r") as f:
     long_description = f.read()
 
 setuptools.setup(
@@ -15,18 +15,15 @@ setuptools.setup(
     description=__description__,
     long_description=long_description,
     author="n1",
-    url="https://gitlab.com/n1_/eagle",
+    author_email="hrdina.pavel@gmail.com",
+    url="https://github.com/im-n1/karpet",
     packages=setuptools.find_packages(),
-    entry_points={
-        "console_scripts": ["eagle = eagle.eagle:eagle"]
-    },
     python_requires=">=3.6",
     classifiers=[
-        "Environment :: Console",
         "Programming Language :: Python :: 3.6",
-        "Intended Audience :: End Users/Desktop",
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3 :: Only",
-        "Topic :: Office/Business :: Scheduling ",
+        "Intended Audience :: Developers",
+        "Topic :: Software Development :: Libraries",
     ]
 )
