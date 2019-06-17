@@ -29,6 +29,12 @@ Library uses a few nifty dependencies and is Python 3.6+ only:
 Usage
 -----
 
+Install the library via pip.
+
+.. code-block::
+
+   ~ pip install karpet
+
 Import the library class first.
 
 .. code-block::
