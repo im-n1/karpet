@@ -19,6 +19,12 @@ setuptools.setup(
     url="https://github.com/im-n1/karpet",
     packages=setuptools.find_packages(),
     python_requires=">=3.6",
+    install_requires=[
+        "numpy >= 1.16.4",
+        "coinmarketcap >= 5.0.3",
+        "pytrends >= 4.6.0",
+        "pandas >= 0.24.2",
+    ],
     classifiers=[
         "Programming Language :: Python :: 3.6",
         "License :: OSI Approved :: MIT License",
