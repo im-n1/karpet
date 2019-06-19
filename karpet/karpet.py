@@ -66,11 +66,6 @@ class Karpet:
 
         output = output.assign(Date=pd.to_datetime(output["Date"]))
 
-#         for col in output.columns:
-#             if output[col].dtype == np.dtype("O"):
-#                 output.loc[output[col] == "-", col] = 0
-#                 output[col] = output[col].astype("int64")
-
         output.columns = [re.sub(r"[^a-z]", "", col.lower()) for col in output.columns]
         output["coin"] = coin
 
