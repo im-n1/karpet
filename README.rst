@@ -58,9 +58,11 @@ Retrieving historical data.
 
 .. image:: https://raw.githubusercontent.com/im-n1/karpet/master/assets/historical_data.png
 
+Retrieving Google Trends - in percents for the given date range.
+
 .. code-block::
 
-    c = Karpet(*get_last_week())
+    c = Karpet(date(2019, 1, 1), date(2019, 5, 1))
     df = c.fetch_google_trends(kw_list=["bitcoin"])  # Dataframe with trends.
     df.head()
 
