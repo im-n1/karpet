@@ -22,14 +22,22 @@ setuptools.setup(
     install_requires=[
         "numpy >= 1.16.4",
         "coinmarketcap >= 5.0.3",
-        "pytrends >= 4.6.0",
         "pandas >= 0.24.2",
     ],
+    extras_require={
+        "twitter": ["twitterscraper >= 1.1.0"],
+        "google": ["pytrends >= 4.6.0"],
+    },
     classifiers=[
         "Programming Language :: Python :: 3.6",
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3 :: Only",
         "Intended Audience :: Developers",
         "Topic :: Software Development :: Libraries",
-    ]
+    ],
+    project_urls={
+        "Bug Tracker": "https://github.com/im-n1/karpet/issues",
+        "Documentation": "https://github.com/im-n1/karpet",
+        "Source Code": "https://github.com/im-n1/karpet",
+    },
 )

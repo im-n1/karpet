@@ -1,11 +1,16 @@
-import numpy as np
-import pandas as pd
-from pytrends.request import TrendReq
+try:
+    from pytrends.request import TrendReq
+    from twitterscraper import query_tweets
+except:
+    pass
+
 from coinmarketcap import Market
 
 import re
 from datetime import timedelta
 import time
+import numpy as np
+import pandas as pd
 
 
 class Karpet:
@@ -161,3 +166,68 @@ class Karpet:
             df[col] = 100.0 * df[col] / max_val
 
         return df.sort_values("date").reset_index(drop=True)
+
+    def fetch_tweets(self, kw_list, lang, limit=None):
+        """
+        Scrapes Twitter without any limits and  returns dataframe with the
+        following structure
+
+        * fullname
+        * id
+        * likes
+        * replies
+        * retweets
+        * text
+        * timestamp
+        * url
+        * user
+        * date
+        * has_link
+
+        :param list kw_list: List of keywords to search for. Will be joined with "OR" operator.
+        :param str lang: Language of tweets to search in.
+        :param int limit: Limit search results. Might get really big and slow so this should help.
+        :return: Pandas dataframe with all search results (tweets).
+        :rtype: pd.DataFrame
+        """
+
+        def process_tweets(tweets):
+            """
+            Cleans up tweets and returns dataframe with the
+            following structure
+
+            * fullname
+            * id
+            * likes
+            * replies
+            * retweets
+            * text
+            * timestamp
+            * url
+            * user
+            * date
+            * has_link
+
+            :param list tweets: List of dicts of tweets data.
+            :return: Returns dataframe with all the scraped tweets (no index).
+            :rtype: pd.DataFrame
+            """
+
+            # 1. Clean up.
+            data = []
+
+            for t in tweets:
+                d = t.__dict__
+                del d["html"]
+                data.append(d)
+
+            # 2. Create dataframe
+            df = pd.DataFrame(data)
+            df["date"] = df["timestamp"].dt.date
+            df["has_link"] = df["text"].apply(lambda text: "http://" in text or "https://" in text)
+
+            return df
+
+        tweets = query_tweets(query=" OR ".join(kw_list), begindate=self.start, lang=lang, limit=limit)
+
+        return process_tweets(tweets)
