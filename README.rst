@@ -11,6 +11,7 @@ It can provide following data:
 
 * coin/token historical price data (no limits)
 * google trends for the given list of keywords (longer period than official API)
+* twitter scraping with no limits
 
 What is upcoming?
 
