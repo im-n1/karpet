@@ -10,7 +10,7 @@ def get_last_week():
 
 def test_get_coin_slug():
 
-    c = Karpet(*get_last_week())
+    c = Karpet()
     assert c.get_coin_slug("BTC") == "bitcoin"
 
 

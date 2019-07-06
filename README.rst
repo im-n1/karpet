@@ -57,7 +57,7 @@ Symbol (ticker) -> coninmarketcap.com URL slug conversion.
 
 .. code-block::
 
-    c = Karpet(date(2019, 1, 1), date(2019, 5, 1))
+    c = Karpet()
     c.get_coin_slug("BTC")  # bitcoin
 
 Retrieving historical data.
