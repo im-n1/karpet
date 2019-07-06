@@ -1,6 +1,14 @@
 .. image:: https://raw.githubusercontent.com/im-n1/karpet/master/assets/logo.png
    :align: center
 
+.. image:: https://img.shields.io/pypi/v/karpet.svg?color=0c7dbe
+   :alt: PyPI
+
+.. image:: https://img.shields.io/pypi/l/karpet.svg?color=0c7dbe
+   :alt: PyPI - License
+
+.. image:: https://img.shields.io/pypi/dm/karpet.svg?color=0c7dbe
+   :alt: PyPI - Downloads
 
 Karpet
 ======
@@ -11,7 +19,7 @@ It can provide following data:
 
 * coin/token historical price data (no limits)
 * google trends for the given list of keywords (longer period than official API)
-* twitter scraping with no limits
+* twitter scraping for the given keywords (no limits)
 
 What is upcoming?
 

@@ -21,8 +21,8 @@ setuptools.setup(
     python_requires=">=3.6",
     install_requires=[
         "numpy >= 1.16.4",
-        "coinmarketcap >= 5.0.3",
         "pandas >= 0.24.2",
+        "requests >= 2.22.0",
     ],
     extras_require={
         "twitter": ["twitterscraper >= 1.1.0"],

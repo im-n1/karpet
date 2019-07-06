@@ -4,13 +4,12 @@ try:
 except:
     pass
 
-from coinmarketcap import Market
-
 import re
 from datetime import timedelta
 import time
 import numpy as np
 import pandas as pd
+import requests
 
 
 class Karpet:
@@ -26,6 +25,44 @@ class Karpet:
         self.start = start
         self.end = end
 
+    def get_quick_search_data(self):
+        """
+        Downloads JSON from coinmarketcap.com quick search
+        widget. Data contains list of all cryptocurrencies
+        where each item has following structure:
+
+        {
+            "name": "Bitcoin",
+            "symbol": "BTC",
+            "rank": 1,
+            "slug": "bitcoin",
+            "tokens": [
+                "Bitcoin",
+                "bitcoin",
+                "BTC"
+            ],
+            "id": 1,
+        }
+
+        :raises Exception: In case of unreachable data or error during parsing.
+        :return: Downloaded JSON data - for each item structure see above.
+        :rtype: list
+        """
+
+        url = "https://s2.coinmarketcap.com/generated/search/quick_search.json"
+
+        # Download.
+        try:
+            response = requests.get(url)
+        except:
+            raise Exception("Couldn't download necessary data from the internet.")
+
+        # Parse.
+        try:
+            return response.json()
+        except:
+            raise Exception("Couldn't parse downloaded data from the internet.")
+
     def get_coin_slug(self, symbol):
         """
         Determines coin coinmarketcap.com URL slug for the given
@@ -36,11 +73,11 @@ class Karpet:
         :rtype: str or None
         """
 
-        coinmarketcap = Market()
+        data = self.get_quick_search_data()
 
-        for c in coinmarketcap.listings()["data"]:
+        for c in data:
             if c["symbol"].upper() == symbol.upper():
-                return c["website_slug"]
+                return c["slug"]
 
     def fetch_crypto_historical_data(self, coin=None, symbol=None):
         """
