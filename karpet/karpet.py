@@ -14,7 +14,9 @@ import requests
 
 class Karpet:
 
-    def __init__(self, start, end):
+    quick_search_data = None
+
+    def __init__(self, start=None, end=None):
         """
         Constructor.
 
@@ -49,6 +51,9 @@ class Karpet:
         :rtype: list
         """
 
+        if self.quick_search_data:
+            return self.quick_search_data
+
         url = "https://s2.coinmarketcap.com/generated/search/quick_search.json"
 
         # Download.
@@ -59,7 +64,9 @@ class Karpet:
 
         # Parse.
         try:
-            return response.json()
+            self.quick_search_data = response.json()
+
+            return self.quick_search_data
         except:
             raise Exception("Couldn't parse downloaded data from the internet.")
 
@@ -83,7 +90,7 @@ class Karpet:
         """
         Retrieve basic historical information for a specific cryptocurrency from coinmarketcap.com
 
-        :param str coin: Coin name - i.e. bitcoin, etherenum, ...
+        :param str coin: Coin name - i.e. bitcoin, etherenum, ...  DEPRECATED!
         :param str symbol: Coin symbol - i.e. BTC, ETH, ...
         :raises Exception: If "coin" or "symbol" params are not specified or coin symbol couldn't be resolved into slug.
         :return: Dataframe with historical data.
@@ -112,6 +119,26 @@ class Karpet:
         output["coin"] = coin
 
         return output
+
+    def fetch_exchanges(self, symbol):
+        """
+        Fetches all exchanges where the given symbol
+        is listed.
+
+        :param str symbol: Coin symbol - i.e. BTC, ETH, ...
+        :return: List of exchanges.
+        :rtype: list
+        """
+
+        slug = self.get_coin_slug(symbol)
+
+        try:
+            url = f"https://coinmarketcap.com/currencies/{slug}/"
+            df = pd.read_html(url, attrs={"id": "markets-table"})[0]
+        except:
+            raise Exception("Couldn't download necessary data from the internet.")
+
+        return df["Source"].unique().tolist()
 
     def fetch_google_trends(self, kw_list, trdays=250, overlap=100,
                             cat=0, geo="", tz=360, gprop="", hl="en-US",

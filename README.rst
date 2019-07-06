@@ -51,7 +51,7 @@ Import the library class first.
 
 .. code-block::
 
-   from karpet.karpet import Karpet
+    from karpet.karpet import Karpet
 
 Symbol (ticker) -> coninmarketcap.com URL slug conversion.
 
@@ -69,6 +69,13 @@ Retrieving historical data.
     df.head()
 
 .. image:: https://raw.githubusercontent.com/im-n1/karpet/master/assets/historical_data.png
+
+Retrieving exchange list.
+
+.. code-block::
+
+    c = Karpet()
+    c.fetch_exchanges("nrg")  # ['DigiFinex', 'KuCoin', 'CryptoBridge', 'Bitbns', 'CoinExchange']
 
 Retrieving twitter tweets.
 

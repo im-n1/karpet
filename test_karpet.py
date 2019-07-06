@@ -20,6 +20,12 @@ def test_fetch_crypto_historical_data():
     assert len(c.fetch_crypto_historical_data(coin="bitcoin")) == 7
 
 
+def test_fetch_exchanges():
+
+    c = Karpet()
+    assert len(c.fetch_exchanges("btc")) > 0
+
+
 def test_fetch_google_trends():
 
     c = Karpet(*get_last_week())
