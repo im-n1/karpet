@@ -106,6 +106,22 @@ And with a few lines of code you can get a chart
 
 .. image:: https://raw.githubusercontent.com/im-n1/karpet/master/assets/trends_chart.png
 
+Changelog
+---------
+
+0.2.1
+~~~~~
+* Added ``fetch_exchanges()`` method for retrieving symbol exchange list.
+* Removed obsolete library dependency.
+
+0.2
+~~~
+* Twitter scraping added.
+
+0.1
+~~~
+* Initial release.
+
 Credits
 -------
 This is my personal library I use in my long-term project. I can pretty much guarantee it will
