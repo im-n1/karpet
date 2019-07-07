@@ -20,6 +20,7 @@ It can provide following data:
 * coin/token historical price data (no limits)
 * google trends for the given list of keywords (longer period than official API)
 * twitter scraping for the given keywords (no limits)
+* much more info about crypto coins/tokens (no rate limits)
 
 What is upcoming?
 
