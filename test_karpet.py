@@ -41,3 +41,21 @@ def test_fetch_tweets():
     df = c.fetch_tweets(["#dash"], "en")
 
     assert len(df) > 0
+
+
+def test_fetch_news():
+
+    c = Karpet()
+    news = c.fetch_news("eth")
+
+    assert len(news) == 10
+    assert "url" in news[0]
+    assert "title" in news[0]
+    assert "date" in news[0]
+
+
+def test_fetch_news_with_limit():
+
+    c = Karpet()
+
+    assert len(c.fetch_news("eth", limit=30)) == 30

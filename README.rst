@@ -10,6 +10,8 @@
 .. image:: https://img.shields.io/pypi/dm/karpet.svg?color=0c7dbe
    :alt: PyPI - Downloads
 
+.. contents::
+
 Karpet
 ======
 Karpet is a tiny library with just a few dependencies
@@ -39,31 +41,33 @@ extras which install optional dependencies:
 Usage
 -----
 
-Install the library via pip.
+1. Install the library via pip.
 
-.. code-block::
+.. code-block:: bash
 
-   ~ pip install karpet  # Basics only
-   ~ pip install karpet[twitter]  # For Twitter scraping
-   ~ pip install karpet[google]  # For Google trends
-   ~ pip install karpet[twitter,google]  # All features
+   pip install karpet  # Basics only
+   pip install karpet[twitter]  # For Twitter scraping
+   pip install karpet[google]  # For Google trends
+   pip install karpet[twitter,google]  # All features
 
-Import the library class first.
+2. Import the library class first.
 
-.. code-block::
+.. code-block:: python
 
     from karpet.karpet import Karpet
 
-Symbol (ticker) -> coninmarketcap.com URL slug conversion.
+Methods
+~~~~~~~
+**Symbol (ticker) -> coninmarketcap.com URL slug conversion.**
 
-.. code-block::
+.. code-block:: python
 
     c = Karpet()
     c.get_coin_slug("BTC")  # bitcoin
 
-Retrieving historical data.
+**Retrieving historical data.**
 
-.. code-block::
+.. code-block:: python
 
     c = Karpet(date(2019, 1, 1), date(2019, 5, 1))
     df = c.fetch_crypto_historical_data(coin="bitcoin")  # Dataframe with historical data
@@ -71,16 +75,17 @@ Retrieving historical data.
 
 .. image:: https://raw.githubusercontent.com/im-n1/karpet/master/assets/historical_data.png
 
-Retrieving exchange list.
+**Retrieving exchange list.**
 
-.. code-block::
+.. code-block:: python
 
     c = Karpet()
-    c.fetch_exchanges("nrg")  # ['DigiFinex', 'KuCoin', 'CryptoBridge', 'Bitbns', 'CoinExchange']
+    c.fetch_exchanges("nrg")
+    ['DigiFinex', 'KuCoin', 'CryptoBridge', 'Bitbns', 'CoinExchange']
 
-Retrieving twitter tweets.
+**Retrieving twitter tweets.**
 
-.. code-block::
+.. code-block:: python
 
     c = Karpet(date(2019, 1, 1), date(2019, 5, 1))
     df = c.fetch_tweets(kw_list=["bitcoin"], lang="en")  # Dataframe with tweets.
@@ -88,9 +93,9 @@ Retrieving twitter tweets.
 
 .. image:: https://raw.githubusercontent.com/im-n1/karpet/master/assets/tweets.png
 
-Retrieving Google Trends - in percents for the given date range.
+**Retrieving Google Trends - in percents for the given date range.**
 
-.. code-block::
+.. code-block:: python
 
     c = Karpet(date(2019, 1, 1), date(2019, 5, 1))
     df = c.fetch_google_trends(kw_list=["bitcoin"])  # Dataframe with trends.
@@ -98,9 +103,24 @@ Retrieving Google Trends - in percents for the given date range.
 
 .. image:: https://raw.githubusercontent.com/im-n1/karpet/master/assets/google_trends.png
 
+**Retrieving crypto news**
+
+.. code-block:: python
+
+   c = Karpet()
+   news = c.fetch_news("btc")  # Gets 10 news.
+   print(news[0])
+   {
+      'url': 'https://cointelegraph.com/ ....',  # Truncated.
+      'title': 'Shell Invests in Blockchain-Based Energy Startup',
+      'date': datetime.datetime(2019, 7, 10, 19, 0, 13),
+      'image_url': 'https://images.cointelegraph.com/....jpg'  # Truncated.
+   }
+   news = c.fetch_news("btc", limit=30)  # Gets 30 news.
+
 And with a few lines of code you can get a chart
 
-.. code-block::
+.. code-block:: python
 
    df = df.set_index("date")
    df.plot()
@@ -109,6 +129,10 @@ And with a few lines of code you can get a chart
 
 Changelog
 ---------
+
+0.2.2
+~~~~~
+* Added ``fetch_news()`` method for retrieving crypto news.
 
 0.2.1
 ~~~~~

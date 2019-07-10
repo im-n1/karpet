@@ -4,12 +4,17 @@ try:
 except:
     pass
 
-import re
-from datetime import timedelta
-import time
+from bs4 import BeautifulSoup
 import numpy as np
 import pandas as pd
 import requests
+import aiohttp
+
+import re
+from datetime import timedelta, datetime
+import time
+import sys
+import asyncio
 
 
 class Karpet:
@@ -295,3 +300,125 @@ class Karpet:
         tweets = query_tweets(query=" OR ".join(kw_list), begindate=self.start, lang=lang, limit=limit)
 
         return process_tweets(tweets)
+
+    def fetch_news(self, symbol, limit=10):
+        """
+        Fetches news of the given symbol. Each news contains
+        following params:
+
+        * url
+        * title
+        * date
+        """
+
+        def get_coin_slug(symbol):
+            """
+            Determines coin coincodex.com URL slug for the given
+            coin symbol.
+
+            :param str symbol: Coin symbol (BTC, ETH, ...)
+            :return: URL slug or None if not found.
+            :rtype: str or None
+            """
+
+            url = "https://coincodex.com/apps/coincodex/cache/all_coins.json"
+
+            try:
+                response = requests.get(url)
+            except:
+                raise Exception("Couldn't download necessary data from the internet.")
+
+            try:
+                data = response.json()
+            except:
+                raise Exception("Couldn't parse downloaded data from the internet.")
+
+            for c in data:
+                if c["symbol"].upper() == symbol.upper():
+                    return c["shortname"]
+
+        async def fetch_features(news):
+            """
+            Fetches all news features.
+
+            :param list news: List of news objects.
+            """
+
+            async def fetch_all(session, news):
+                """
+                Fetches all news features.
+
+                :param aiohttp.ClientSession session: Session instance.
+                :param list news: List of news objects.
+                """
+
+                await asyncio.gather(*[fetch_one(session, n) for n in news])
+
+            async def fetch_one(session, news):
+                """
+                Fetches a few features to the given news object. Features
+                are set directly to the news object.
+                Fetched features are:
+
+                * image
+
+                :param aiohttp.ClientSession session: Session instance.
+                :param object news: News object.
+                """
+
+                async with session.get(news["url"]) as response:
+
+                    html = await response.text()
+                    dom = BeautifulSoup(html, features="lxml")
+
+                    # Image.
+                    try:
+                        news["image_url"] = dom.find("meta", {"property": "og:image"})["content"]
+                    except:
+                        pass
+
+            async with aiohttp.ClientSession() as session:
+                await fetch_all(session, news)
+
+        url = f"https://coincodex.com/api/coincodexicos/get_news/{symbol}/{limit}/1/"
+        data = self.get_json(url)
+
+        news = []
+
+        for n in data:
+            try:
+                news.append({
+                    "url": n["url"],
+                    "title": n["title"],
+                    "date": datetime.strptime(n["date"], "%Y-%m-%d %H:%M:%S")
+                })
+            except:
+                tb = sys.exc_info()[2]
+                raise Exception("Couldn't parse news. Skipping...").with_traceback(tb)
+
+        # Fetch news features.
+        asyncio.run(fetch_features(news))
+
+        return news
+
+    def get_json(self, url):
+        """
+        Downloads data from the given  URL and parses them as JSON.
+        Handles exception and raises own ones with sane messages.
+
+        :param str url: URL to be scraped.
+        :return: Parsed JSON data.
+        :rtype: object or list
+        """
+
+        # Download.
+        try:
+            response = requests.get(url)
+        except:
+            raise Exception("Couldn't download necessary data from the internet.")
+
+        # Parse.
+        try:
+            return response.json()
+        except:
+            raise Exception("Couldn't parse downloaded data from the internet.")

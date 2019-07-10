@@ -23,9 +23,11 @@ setuptools.setup(
         "numpy >= 1.16.4",
         "pandas >= 0.24.2",
         "requests >= 2.22.0",
+        "beautifulsoup4 >= 4.7.1",
+        "aiohttp >= 3.5.4",
     ],
     extras_require={
-        "twitter": ["twitterscraper >= 1.1.0"],
+        "twitter": ["twitterscraper == 1.1.0"],
         "google": ["pytrends >= 4.6.0"],
     },
     classifiers=[
