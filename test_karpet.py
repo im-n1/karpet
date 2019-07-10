@@ -5,7 +5,7 @@ from datetime import date, timedelta
 
 def get_last_week():
 
-    return date.today() - timedelta(days=7), date.today()
+    return date.today() - timedelta(days=13), date.today() - timedelta(days=7)
 
 
 def test_get_coin_slug():
