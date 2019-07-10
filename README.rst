@@ -40,7 +40,6 @@ extras which install optional dependencies:
 
 Usage
 -----
-
 1. Install the library via pip.
 
 .. code-block:: bash
@@ -56,16 +55,18 @@ Usage
 
     from karpet.karpet import Karpet
 
-Methods
-~~~~~~~
-**Symbol (ticker) -> coninmarketcap.com URL slug conversion.**
+``get_coin_slug()``
+~~~~~~~~~~~~~~~~~~~
+Symbol (ticker) -> coninmarketcap.com URL slug conversion.
 
 .. code-block:: python
 
     c = Karpet()
     c.get_coin_slug("BTC")  # bitcoin
 
-**Retrieving historical data.**
+``fetch_historical_data()``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Retrieves historical data.
 
 .. code-block:: python
 
@@ -75,7 +76,9 @@ Methods
 
 .. image:: https://raw.githubusercontent.com/im-n1/karpet/master/assets/historical_data.png
 
-**Retrieving exchange list.**
+``fetch_exchanges()``
+~~~~~~~~~~~~~~~~~~~~~
+Retrieves exchange list.
 
 .. code-block:: python
 
@@ -83,7 +86,9 @@ Methods
     c.fetch_exchanges("nrg")
     ['DigiFinex', 'KuCoin', 'CryptoBridge', 'Bitbns', 'CoinExchange']
 
-**Retrieving twitter tweets.**
+``fetch_tweets()``
+~~~~~~~~~~~~~~~~~~
+Retrieves twitter tweets.
 
 .. code-block:: python
 
@@ -93,7 +98,9 @@ Methods
 
 .. image:: https://raw.githubusercontent.com/im-n1/karpet/master/assets/tweets.png
 
-**Retrieving Google Trends - in percents for the given date range.**
+``fetch_google_trends()``
+~~~~~~~~~~~~~~~~~~~~~~~~~
+Retrieves Google Trends - in percents for the given date range.
 
 .. code-block:: python
 
@@ -103,7 +110,18 @@ Methods
 
 .. image:: https://raw.githubusercontent.com/im-n1/karpet/master/assets/google_trends.png
 
-**Retrieving crypto news**
+And with a few lines of code you can get a chart
+
+.. code-block:: python
+
+   df = df.set_index("date")
+   df.plot()
+
+.. image:: https://raw.githubusercontent.com/im-n1/karpet/master/assets/trends_chart.png
+
+``fetch_news()``
+~~~~~~~~~~~~~~~~
+Retrieves crypto news.
 
 .. code-block:: python
 
@@ -118,18 +136,8 @@ Methods
    }
    news = c.fetch_news("btc", limit=30)  # Gets 30 news.
 
-And with a few lines of code you can get a chart
-
-.. code-block:: python
-
-   df = df.set_index("date")
-   df.plot()
-
-.. image:: https://raw.githubusercontent.com/im-n1/karpet/master/assets/trends_chart.png
-
 Changelog
 ---------
-
 0.2.2
 ~~~~~
 * Added ``fetch_news()`` method for retrieving crypto news.
