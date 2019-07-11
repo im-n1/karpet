@@ -1,4 +1,4 @@
-from karpet.karpet import Karpet
+from karpet import Karpet
 
 from datetime import date, timedelta
 

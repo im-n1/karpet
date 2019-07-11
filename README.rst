@@ -53,7 +53,7 @@ Usage
 
 .. code-block:: python
 
-    from karpet.karpet import Karpet
+    from karpet import Karpet
 
 ``get_coin_slug()``
 ~~~~~~~~~~~~~~~~~~~

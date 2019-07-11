@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import setuptools
-from karpet import __version__, __description__
+from karpet.meta import __version__, __description__
 
 
 # Long description
@@ -24,6 +24,7 @@ setuptools.setup(
         "pandas >= 0.24.2",
         "requests >= 2.22.0",
         "beautifulsoup4 >= 4.7.1",
+        "lxml >= 4.3.4",
         "aiohttp >= 3.5.4",
     ],
     extras_require={
