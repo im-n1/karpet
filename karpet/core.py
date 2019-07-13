@@ -339,7 +339,7 @@ class Karpet:
 
         async def fetch_features(news):
             """
-            Fetches all news features.
+            Asynchronously fetches all news features.
 
             :param list news: List of news objects.
             """
