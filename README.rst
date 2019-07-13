@@ -138,6 +138,10 @@ Retrieves crypto news.
 
 Changelog
 ---------
+0.2.3
+~~~~~
+* Simplified import from `from karpet.karpet import Karpet` to `from karpet import Karpet`.
+
 0.2.2
 ~~~~~
 * Added ``fetch_news()`` method for retrieving crypto news.
