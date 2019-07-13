@@ -140,7 +140,7 @@ Changelog
 ---------
 0.2.3
 ~~~~~
-* Simplified import from `from karpet.karpet import Karpet` to `from karpet import Karpet`.
+* Simplified import from ``from karpet.karpet import Karpet`` to ``from karpet import Karpet``.
 
 0.2.2
 ~~~~~
