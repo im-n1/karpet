@@ -138,6 +138,11 @@ Retrieves crypto news.
 
 Changelog
 ---------
+0.2.4
+~~~~~
+* ``fetch_news()`` adds new "description" item and renames "image_url" to "image".
+* All ``fetch_news()`` item properties are now presented even if they are ``None``.
+
 0.2.3
 ~~~~~
 * Simplified import from ``from karpet.karpet import Karpet`` to ``from karpet import Karpet``.

@@ -308,7 +308,9 @@ class Karpet:
 
         * url
         * title
+        * description
         * date
+        * image
         """
 
         def get_coin_slug(symbol):
@@ -373,9 +375,15 @@ class Karpet:
 
                     # Image.
                     try:
-                        news["image_url"] = dom.find("meta", {"property": "og:image"})["content"]
+                        news["image"] = dom.find("meta", {"property": "og:image"})["content"]
                     except:
-                        pass
+                        news["image"] = None
+
+                    # Description.
+                    try:
+                        news["description"] = dom.find("meta", {"property": "og:description"})["content"]
+                    except:
+                        news["description"] = None
 
             async with aiohttp.ClientSession() as session:
                 await fetch_all(session, news)
