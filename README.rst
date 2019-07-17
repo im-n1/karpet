@@ -131,8 +131,9 @@ Retrieves crypto news.
    {
       'url': 'https://cointelegraph.com/ ....',  # Truncated.
       'title': 'Shell Invests in Blockchain-Based Energy Startup',
+      'description': 'The world’s fifth top oil and gas firm, Shell, has',
       'date': datetime.datetime(2019, 7, 10, 19, 0, 13),
-      'image_url': 'https://images.cointelegraph.com/....jpg'  # Truncated.
+      'image': 'https://images.cointelegraph.com/....jpg'  # Truncated.
    }
    news = c.fetch_news("btc", limit=30)  # Gets 30 news.
 

@@ -363,6 +363,7 @@ class Karpet:
                 Fetched features are:
 
                 * image
+                * description
 
                 :param aiohttp.ClientSession session: Session instance.
                 :param object news: News object.
