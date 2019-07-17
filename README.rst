@@ -131,7 +131,7 @@ Retrieves crypto news.
    {
       'url': 'https://cointelegraph.com/ ....',  # Truncated.
       'title': 'Shell Invests in Blockchain-Based Energy Startup',
-      'description': 'The world’s fifth top oil and gas firm, Shell, has',
+      'description': 'The world’s fifth top oil and gas firm, Shell, has...',  # Truncated.
       'date': datetime.datetime(2019, 7, 10, 19, 0, 13),
       'image': 'https://images.cointelegraph.com/....jpg'  # Truncated.
    }
