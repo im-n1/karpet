@@ -116,7 +116,7 @@ class Karpet:
             coin,
             self.start.strftime("%Y%m%d"),
             self.end.strftime("%Y%m%d")
-        ))[0]
+        ), flavor="lxml")[0]
 
         output = output.assign(Date=pd.to_datetime(output["Date"]))
 
