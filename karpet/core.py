@@ -11,9 +11,8 @@ import requests
 import aiohttp
 
 import re
-from datetime import timedelta, datetime
+from datetime import timedelta
 import time
-import sys
 import asyncio
 
 
@@ -311,7 +310,23 @@ class Karpet:
         * description
         * date
         * image
+
+        :param str symbol: Coin symbol the news will be fetched for.
+        :param int limit: Limit for news count.
         """
+
+        def get_news(symbol, limit):
+            """
+            Fetches news from coincodex.com.
+
+            :return: List of news urls.
+            :rtype: list
+            """
+
+            url = f"https://coincodex.com/api/coincodexicos/get_news/{symbol}/{limit}/1/"
+            data = self._get_json(url)
+
+            return [{"url": d["url"]} for d in data]
 
         def get_coin_slug(symbol):
             """
@@ -339,78 +354,158 @@ class Karpet:
                 if c["symbol"].upper() == symbol.upper():
                     return c["shortname"]
 
-        async def fetch_features(news):
-            """
-            Asynchronously fetches all news features.
+        # Fetch features.
+        news = get_news(symbol, limit)
+        asyncio.run(self._fetch_news_features(news))
 
+        return self._drop_bad_news(news)[:limit]
+
+    def fetch_top_news(self):
+        """
+        Fetches top crypto news. Returns Editor's choice and Hot stories.
+
+        * url
+        * title
+        * description
+        * date
+        * image
+
+        :return: Tuple where first are editors choice news and second hot stories.
+        :rtype: tuple
+        """
+
+        def get_top_news():
+            """
+            Fetches editors choice and hot stories from cointelegraph.com front page.
+
+            :return: Dict with ``editors_choice`` and ``hot_stories`` items.
+            :rtype: dict
+            """
+
+            headers = {
+                "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:69.0) Gecko/20100101 Firefox/69.0",
+            }
+            response = requests.get("https://cointelegraph.com/", headers=headers)
+            dom = BeautifulSoup(response.text, "lxml")
+
+            def parse_section_news(section):
+                """
+                Parse section with news. Section contains of titles and
+                links to the news where only links are parsed out.
+
+                :param object section: BeautifulSoap element object of the section.
+                :return: List of news objects - {"url": "..."}.
+                :rtype: list
+                """
+
+                news_items = section.find_all(class_="main-news-tabs__item")
+                news = []
+
+                if len(news_items):
+
+                    for i in news_items:
+                        news.append({"url": i.find("a")["href"]})
+
+                return news
+
+            editors_choice, hot_stories = dom.find_all(class_="main-news-tabs__list")
+
+            return parse_section_news(editors_choice), parse_section_news(hot_stories)
+
+        # Fetch features.
+        editors_choice, hot_stories = get_top_news()
+        asyncio.run(self._fetch_news_features(editors_choice))
+        print("here")
+        asyncio.run(self._fetch_news_features(hot_stories))
+        print("here 2")
+
+        return editors_choice, hot_stories
+
+    async def _fetch_news_features(self, news):
+        """
+        Asynchronously fetches all news features.
+
+        :param list news: List of news objects.
+        """
+
+        async def fetch_all(session, news):
+            """
+            Fetches all news features.
+
+            :param aiohttp.ClientSession session: Session instance.
             :param list news: List of news objects.
             """
 
-            async def fetch_all(session, news):
-                """
-                Fetches all news features.
+            await asyncio.gather(*[fetch_one(session, n) for n in news])
 
-                :param aiohttp.ClientSession session: Session instance.
-                :param list news: List of news objects.
-                """
+        async def fetch_one(session, news):
+            """
+            Fetches a few features to the given news object. Features
+            are set directly to the news object.
+            Fetched features are:
 
-                await asyncio.gather(*[fetch_one(session, n) for n in news])
+            * date
+            * image
+            * description
 
-            async def fetch_one(session, news):
-                """
-                Fetches a few features to the given news object. Features
-                are set directly to the news object.
-                Fetched features are:
+            :param aiohttp.ClientSession session: Session instance.
+            :param object news: News object.
+            """
 
-                * image
-                * description
+            async with session.get(news["url"]) as response:
 
-                :param aiohttp.ClientSession session: Session instance.
-                :param object news: News object.
-                """
+                html = await response.text()
+                dom = BeautifulSoup(html, features="lxml")
 
-                async with session.get(news["url"]) as response:
+                # Title.
+                try:
+                    news["title"] = dom.find("meta", {"property": "og:title"})["content"]
+                except:
+                    news["title"] = None
 
-                    html = await response.text()
-                    dom = BeautifulSoup(html, features="lxml")
+                # Date.
+                try:
+                    news["date"] = dom.find("meta", {"property": "article:published_time"})["content"]
+                except:
+                    news["date"] = None
 
-                    # Image.
-                    try:
-                        news["image"] = dom.find("meta", {"property": "og:image"})["content"]
-                    except:
-                        news["image"] = None
+                # Image.
+                try:
+                    news["image"] = dom.find("meta", {"property": "og:image"})["content"]
+                except:
+                    news["image"] = None
 
-                    # Description.
-                    try:
-                        news["description"] = dom.find("meta", {"property": "og:description"})["content"]
-                    except:
-                        news["description"] = None
+                # Description.
+                try:
+                    news["description"] = dom.find("meta", {"property": "og:description"})["content"]
+                except:
+                    news["description"] = None
 
-            async with aiohttp.ClientSession() as session:
-                await fetch_all(session, news)
+        async with aiohttp.ClientSession() as session:
+            await fetch_all(session, news)
 
-        url = f"https://coincodex.com/api/coincodexicos/get_news/{symbol}/{limit}/1/"
-        data = self.get_json(url)
+    def _drop_bad_news(self, news):
+        """
+        Drops news that doesn't suit following requirements.
 
-        news = []
+        * must have published date (date)
 
-        for n in data:
-            try:
-                news.append({
-                    "url": n["url"],
-                    "title": n["title"],
-                    "date": datetime.strptime(n["date"], "%Y-%m-%d %H:%M:%S")
-                })
-            except:
-                tb = sys.exc_info()[2]
-                raise Exception("Couldn't parse news. Skipping...").with_traceback(tb)
+        :param list news: List of news.
+        :return: Filtered list of news.
+        :rtype: list
+        """
 
-        # Fetch news features.
-        asyncio.run(fetch_features(news))
+        filtered_news = []
 
-        return news
+        for n in news:
+            if not n["date"]:
+                continue
 
-    def get_json(self, url):
+            filtered_news.append(n)
+
+        return filtered_news
+
+    def _get_json(self, url):
         """
         Downloads data from the given  URL and parses them as JSON.
         Handles exception and raises own ones with sane messages.

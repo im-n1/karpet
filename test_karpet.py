@@ -45,10 +45,10 @@ def test_fetch_tweets():
 
 def test_fetch_news():
 
-    c = Karpet()
-    news = c.fetch_news("eth")
+    k = Karpet()
+    news = k.fetch_news("eth")
 
-    assert len(news) == 10
+    assert len(news) > 0
     assert "url" in news[0]
     assert "title" in news[0]
     assert "date" in news[0]
@@ -56,6 +56,25 @@ def test_fetch_news():
 
 def test_fetch_news_with_limit():
 
-    c = Karpet()
+    k = Karpet()
+    news = k.fetch_news("eth", limit=30)
 
-    assert len(c.fetch_news("eth", limit=30)) == 30
+    assert 0 < len(news) <= 30
+    print(f"Fetched {len(news)} news.")
+
+
+def test_fetch_top_news():
+
+    k = Karpet()
+    editors_choice, hot_stories = k.fetch_top_news()
+
+    assert len(editors_choice) == 5
+    assert len(hot_stories) == 5
+
+    assert "url" in editors_choice[0]
+    assert "title" in editors_choice[0]
+    assert "date" in editors_choice[0]
+
+    assert "url" in hot_stories[0]
+    assert "title" in hot_stories[0]
+    assert "date" in hot_stories[0]

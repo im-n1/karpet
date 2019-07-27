@@ -61,8 +61,8 @@ Symbol (ticker) -> coninmarketcap.com URL slug conversion.
 
 .. code-block:: python
 
-    c = Karpet()
-    c.get_coin_slug("BTC")  # bitcoin
+    k = Karpet()
+    k.get_coin_slug("BTC")  # bitcoin
 
 ``fetch_historical_data()``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -70,8 +70,8 @@ Retrieves historical data.
 
 .. code-block:: python
 
-    c = Karpet(date(2019, 1, 1), date(2019, 5, 1))
-    df = c.fetch_crypto_historical_data(coin="bitcoin")  # Dataframe with historical data
+    k = Karpet(date(2019, 1, 1), date(2019, 5, 1))
+    df = k.fetch_crypto_historical_data(symbol="btc")  # Dataframe with historical data.
     df.head()
 
 .. image:: https://raw.githubusercontent.com/im-n1/karpet/master/assets/historical_data.png
@@ -82,8 +82,8 @@ Retrieves exchange list.
 
 .. code-block:: python
 
-    c = Karpet()
-    c.fetch_exchanges("nrg")
+    k = Karpet()
+    k.fetch_exchanges("nrg")
     ['DigiFinex', 'KuCoin', 'CryptoBridge', 'Bitbns', 'CoinExchange']
 
 ``fetch_tweets()``
@@ -92,8 +92,8 @@ Retrieves twitter tweets.
 
 .. code-block:: python
 
-    c = Karpet(date(2019, 1, 1), date(2019, 5, 1))
-    df = c.fetch_tweets(kw_list=["bitcoin"], lang="en")  # Dataframe with tweets.
+    k = Karpet(date(2019, 1, 1), date(2019, 5, 1))
+    df = k.fetch_tweets(kw_list=["bitcoin"], lang="en")  # Dataframe with tweets.
     df.head()
 
 .. image:: https://raw.githubusercontent.com/im-n1/karpet/master/assets/tweets.png
@@ -104,8 +104,8 @@ Retrieves Google Trends - in percents for the given date range.
 
 .. code-block:: python
 
-    c = Karpet(date(2019, 1, 1), date(2019, 5, 1))
-    df = c.fetch_google_trends(kw_list=["bitcoin"])  # Dataframe with trends.
+    k = Karpet(date(2019, 1, 1), date(2019, 5, 1))
+    df = k.fetch_google_trends(kw_list=["bitcoin"])  # Dataframe with trends.
     df.head()
 
 .. image:: https://raw.githubusercontent.com/im-n1/karpet/master/assets/google_trends.png
@@ -125,8 +125,8 @@ Retrieves crypto news.
 
 .. code-block:: python
 
-   c = Karpet()
-   news = c.fetch_news("btc")  # Gets 10 news.
+   k = Karpet()
+   news = k.fetch_news("btc")  # Gets 10 news.
    print(news[0])
    {
       'url': 'https://cointelegraph.com/ ....',  # Truncated.
@@ -135,10 +135,47 @@ Retrieves crypto news.
       'date': datetime.datetime(2019, 7, 10, 19, 0, 13),
       'image': 'https://images.cointelegraph.com/....jpg'  # Truncated.
    }
-   news = c.fetch_news("btc", limit=30)  # Gets 30 news.
+   news = k.fetch_news("btc", limit=30)  # Gets 30 news.
+
+``fetch_top_news()``
+~~~~~~~~~~~~~~~~~~~~
+Retrieves top crypto news in 2 categories:
+
+* Editor's choices - articles picked by editors
+* Hot stories - articles with most views
+
+.. code-block:: python
+
+   k = Karpet()
+   editors_choices, top_stories = k.fetch_top_news()
+   print(len(editors_choices))
+   5
+   print(len(top_stories))
+   5
+   print(editors_choices[0])
+   {
+      'url': 'https://cointelegraph.com/...',  # Truncated.
+      'title': 'Bank of China’s New Infographic Shows Why Bitcoin Price Is Going Up',
+      'date': '2019-07-27T10:07:00+01:00',
+      'image': 'https://images.cointelegraph.com/images/740_aHR...', # Truncated.
+      'description': 'The Chinese central bank released on its website an ...'  # Truncated.
+   }
+   print(top_stories[0])
+   {
+      'url': 'https://cointelegraph.com/...',  # Truncated.
+      'title': 'Bitcoin Price Shuns Volatility as Analysts Warn of Potential Drop to $7,000',
+      'date': '2019-07-22T09:21:00+01:00',
+      'image': 'https://images.cointelegraph.com/images/740_aHR0c...'  # Truncated.
+      'description': 'Stability around $10,600 for Bitcoin price is ...'  # Truncated.
+   }
+
 
 Changelog
 ---------
+0.2.5
+~~~~~
+* Added ``fetch_top_news()`` method for top crypto news separated in 2 categories.
+
 0.2.4
 ~~~~~
 * ``fetch_news()`` adds new "description" item and renames "image_url" to "image".
