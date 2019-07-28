@@ -132,7 +132,7 @@ Retrieves crypto news.
       'url': 'https://cointelegraph.com/ ....',  # Truncated.
       'title': 'Shell Invests in Blockchain-Based Energy Startup',
       'description': 'The world’s fifth top oil and gas firm, Shell, has...',  # Truncated.
-      'date': datetime.datetime(2019, 7, 10, 19, 0, 13),
+      'date': datetime.datetime(2019, 7, 28, 9, 24, tzinfo=datetime.timezone(datetime.timedelta(seconds=3600)))
       'image': 'https://images.cointelegraph.com/....jpg'  # Truncated.
    }
    news = k.fetch_news("btc", limit=30)  # Gets 30 news.
@@ -156,7 +156,7 @@ Retrieves top crypto news in 2 categories:
    {
       'url': 'https://cointelegraph.com/...',  # Truncated.
       'title': 'Bank of China’s New Infographic Shows Why Bitcoin Price Is Going Up',
-      'date': '2019-07-27T10:07:00+01:00',
+      'date': datetime.datetime(2019, 7, 27, 10, 7, tzinfo=datetime.timezone(datetime.timedelta(seconds=3600))),
       'image': 'https://images.cointelegraph.com/images/740_aHR...', # Truncated.
       'description': 'The Chinese central bank released on its website an ...'  # Truncated.
    }
@@ -164,7 +164,7 @@ Retrieves top crypto news in 2 categories:
    {
       'url': 'https://cointelegraph.com/...',  # Truncated.
       'title': 'Bitcoin Price Shuns Volatility as Analysts Warn of Potential Drop to $7,000',
-      'date': '2019-07-22T09:21:00+01:00',
+      'date': datetime.datetime(2019, 7, 27, 10, 7, tzinfo=datetime.timezone(datetime.timedelta(seconds=3600))),
       'image': 'https://images.cointelegraph.com/images/740_aHR0c...'  # Truncated.
       'description': 'Stability around $10,600 for Bitcoin price is ...'  # Truncated.
    }

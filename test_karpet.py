@@ -1,6 +1,6 @@
 from karpet import Karpet
 
-from datetime import date, timedelta
+from datetime import datetime, date, timedelta
 
 
 def get_last_week():
@@ -53,6 +53,9 @@ def test_fetch_news():
     assert "title" in news[0]
     assert "date" in news[0]
 
+    if news[0]["date"] is not None:
+        assert isinstance(news[0]["date"], datetime)
+
 
 def test_fetch_news_with_limit():
 
@@ -75,6 +78,12 @@ def test_fetch_top_news():
     assert "title" in editors_choice[0]
     assert "date" in editors_choice[0]
 
+    if editors_choice[0]["date"] is not None:
+        assert isinstance(editors_choice[0]["date"], datetime)
+
     assert "url" in hot_stories[0]
     assert "title" in hot_stories[0]
     assert "date" in hot_stories[0]
+
+    if hot_stories[0]["date"] is not None:
+        assert isinstance(hot_stories[0]["date"], datetime)

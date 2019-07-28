@@ -11,7 +11,7 @@ import requests
 import aiohttp
 
 import re
-from datetime import timedelta
+from datetime import datetime, timedelta
 import time
 import asyncio
 
@@ -465,7 +465,8 @@ class Karpet:
 
                 # Date.
                 try:
-                    news["date"] = dom.find("meta", {"property": "article:published_time"})["content"]
+                    d = dom.find("meta", {"property": "article:published_time"})["content"]
+                    news["date"] = datetime.strptime(d, "%Y-%m-%dT%H:%M:%S%z")
                 except:
                     news["date"] = None
 
