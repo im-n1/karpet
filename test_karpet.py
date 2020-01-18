@@ -1,6 +1,8 @@
+from datetime import date, datetime, timedelta
+
 from karpet import Karpet
 
-from datetime import datetime, date, timedelta
+CRYPTOCOMPARE_API_KEY = None
 
 
 def get_last_week():
@@ -8,22 +10,29 @@ def get_last_week():
     return date.today() - timedelta(days=13), date.today() - timedelta(days=7)
 
 
-def test_get_coin_slug():
-
-    c = Karpet()
-    assert c.get_coin_slug("BTC") == "bitcoin"
-
-
 def test_fetch_crypto_historical_data():
 
-    c = Karpet(*get_last_week())
-    assert len(c.fetch_crypto_historical_data(coin="bitcoin")) == 7
+    c = Karpet(cryptocompare_api_key=CRYPTOCOMPARE_API_KEY)
+
+    assert 3000 < len(c.fetch_crypto_historical_data("BTC"))
+
+
+def test_fetch_crypto_historical_data_limited():
+
+    c = Karpet(
+        date(2019, 1, 1), date(2019, 1, 30), cryptocompare_api_key=CRYPTOCOMPARE_API_KEY
+    )
+
+    assert 29 == len(c.fetch_crypto_historical_data("BTC"))
 
 
 def test_fetch_exchanges():
 
     c = Karpet()
-    assert len(c.fetch_exchanges("btc")) > 0
+    exchanges = c.fetch_crypto_exchanges("btc")
+
+    assert len(exchanges) > 0
+    assert "Binance" in exchanges
 
 
 def test_fetch_google_trends():

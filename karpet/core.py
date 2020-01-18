@@ -4,32 +4,36 @@ try:
 except:
     pass
 
-from bs4 import BeautifulSoup
+import asyncio
+import time
+from datetime import datetime, timedelta
+
+import aiohttp
 import numpy as np
 import pandas as pd
 import requests
-import aiohttp
+from bs4 import BeautifulSoup
 
-import re
-from datetime import datetime, timedelta
-import time
-import asyncio
+from . import utils
 
 
 class Karpet:
 
     quick_search_data = None
+    cryptocompare_api_url = "https://min-api.cryptocompare.com/data"
 
-    def __init__(self, start=None, end=None):
+    def __init__(self, start=None, end=None, cryptocompare_api_key=None):
         """
         Constructor.
 
         :param datetime.date start: History data begining.
         :param datetime.date end: History data end.
+        :param str cryptocompare_api_key: CrtyptoCompare.com API key.
         """
 
         self.start = start
         self.end = end
+        self.cryptocompare_api_key = cryptocompare_api_key
 
     def get_quick_search_data(self):
         """
@@ -74,57 +78,59 @@ class Karpet:
         except:
             raise Exception("Couldn't parse downloaded data from the internet.")
 
-    def get_coin_slug(self, symbol):
+    def fetch_crypto_historical_data(self, symbol):
         """
-        Determines coin coinmarketcap.com URL slug for the given
-        coin symbol.
+        Retrieve basic historical information for a specific cryptocurrency from cryptocompare.com
 
-        :param str symbol: Coin symbol (BTC, ETH, ...)
-        :return: URL slug or None if not found.
-        :rtype: str or None
-        """
+        Output dataframe has following columns:
 
-        data = self.get_quick_search_data()
+        * close
+        * conversionSymbol
+        * conversionType
+        * high
+        * low
+        * open
+        * volumefrom
+        * volumeto
 
-        for c in data:
-            if c["symbol"].upper() == symbol.upper():
-                return c["slug"]
+        Index is datetime64[ns].
 
-    def fetch_crypto_historical_data(self, coin=None, symbol=None):
-        """
-        Retrieve basic historical information for a specific cryptocurrency from coinmarketcap.com
-
-        :param str coin: Coin name - i.e. bitcoin, etherenum, ...  DEPRECATED!
         :param str symbol: Coin symbol - i.e. BTC, ETH, ...
-        :raises Exception: If "coin" or "symbol" params are not specified or coin symbol couldn't be resolved into slug.
+        :raises Exception: If data couldn't be download form the internet.
         :return: Dataframe with historical data.
         :rtype: pd.DataFrame
         """
 
-        # Check input parameters - coin or symbol is required.
-        if not coin and not symbol:
-            raise Exception('Please specify "coin" or "symbol" parameters.')
+        data = []
+        step = 1
+        limit = 2000
+        url = f"{self.cryptocompare_api_url}/v2/histoday?fsym={symbol}&tsym=USD&limit={limit}&allData=true"
 
-        if symbol:
-            coin = self.get_coin_slug(symbol)
+        # Fetch and check the response.
+        response_data = self._get_json(url)
 
-            if not coin:
-                raise Exception(f"Couldn't resolve coin symbol {coin} into slug.")
+        if "Success" != response_data["Response"]:
+            raise Exception("Couldn't download necessary data from the internet.")
 
-        output = pd.read_html("https://coinmarketcap.com/currencies/{}/historical-data/?start={}&end={}".format(
-            coin,
-            self.start.strftime("%Y%m%d"),
-            self.end.strftime("%Y%m%d")
-        ), flavor="lxml")[0]
+        data = response_data["Data"]["Data"]
 
-        output = output.assign(Date=pd.to_datetime(output["Date"]))
+        # Check if data are limited and if yes drop the unwanted data.
+        if self.start:
+            start = utils.date_to_timestamp(self.start)
+            data = list(filter(lambda i: i["time"] >= start, data))
 
-        output.columns = [re.sub(r"[^a-z]", "", col.lower()) for col in output.columns]
-        output["coin"] = coin
+        if self.end:
+            end = utils.date_to_timestamp(self.end)
+            data = list(filter(lambda i: i["time"] <= end, data))
 
-        return output
+        df = pd.DataFrame.from_records(data)
+        df["date"] = pd.to_datetime(df["time"], unit="s")
+        df = df.set_index("date")
+        df = df.drop("time", axis=1)
 
-    def fetch_exchanges(self, symbol):
+        return df
+
+    def fetch_crypto_exchanges(self, symbol):
         """
         Fetches all exchanges where the given symbol
         is listed.
@@ -134,19 +140,28 @@ class Karpet:
         :rtype: list
         """
 
-        slug = self.get_coin_slug(symbol)
+        url = f"{self.cryptocompare_api_url}/v4/all/exchanges?fsym={symbol}"
 
-        try:
-            url = f"https://coinmarketcap.com/currencies/{slug}/"
-            df = pd.read_html(url, attrs={"id": "markets-table"})[0]
-        except:
+        # Fetch and check the response.
+        response_data = self._get_json(url)
+
+        if "Success" != response_data["Response"]:
             raise Exception("Couldn't download necessary data from the internet.")
 
-        return df["Source"].unique().tolist()
+        return list(response_data["Data"]["exchanges"].keys())
 
-    def fetch_google_trends(self, kw_list, trdays=250, overlap=100,
-                            cat=0, geo="", tz=360, gprop="", hl="en-US",
-                            sleeptime=1):
+    def fetch_google_trends(
+        self,
+        kw_list,
+        trdays=250,
+        overlap=100,
+        cat=0,
+        geo="",
+        tz=360,
+        gprop="",
+        hl="en-US",
+        sleeptime=1,
+    ):
         """
         Retrieve daily Google trends data for a list of search terms.
 
@@ -183,17 +198,24 @@ class Karpet:
 
         # Get the dates for each search.
         if n_days <= trdays:
-            trend_dates = ["{} {}".format(self.start.strftime("%Y-%m-%d"), self.end.strftime("%Y-%m-%d"))]
+            trend_dates = [
+                "{} {}".format(
+                    self.start.strftime("%Y-%m-%d"), self.end.strftime("%Y-%m-%d")
+                )
+            ]
         else:
             trend_dates = [
                 "{} {}".format(
                     (self.end - timedelta(i + trdays)).strftime("%Y-%m-%d"),
-                    (self.end - timedelta(i)).strftime("%Y-%m-%d")
-                ) for i in range(0, n_days - trdays + stich_overlap, stich_overlap)
+                    (self.end - timedelta(i)).strftime("%Y-%m-%d"),
+                )
+                for i in range(0, n_days - trdays + stich_overlap, stich_overlap)
             ]
 
         # Try to fetch first batch.
-        pytrends.build_payload(kw_list, cat=cat, timeframe=trend_dates[0], geo=geo, gprop=gprop)
+        pytrends.build_payload(
+            kw_list, cat=cat, timeframe=trend_dates[0], geo=geo, gprop=gprop
+        )
         df = pytrends.interest_over_time().reset_index()
 
         if len(df) == 0:
@@ -203,7 +225,9 @@ class Karpet:
         for date in trend_dates[1:]:
 
             time.sleep(sleeptime)
-            pytrends.build_payload(kw_list, cat=cat, timeframe=date, geo=geo, gprop=gprop)
+            pytrends.build_payload(
+                kw_list, cat=cat, timeframe=date, geo=geo, gprop=gprop
+            )
 
             temp_trend = pytrends.interest_over_time().reset_index()
             temp_trend = temp_trend.merge(df, on="date", how="left")
@@ -211,12 +235,16 @@ class Karpet:
             # it's ugly but we'll exploit the common column names
             # and then rename the underscore containing column names
             for kw in kw_list:
-                norm_factor = np.ma.masked_invalid(temp_trend[kw + "_y"] / temp_trend[kw + "_x"]).mean()
+                norm_factor = np.ma.masked_invalid(
+                    temp_trend[kw + "_y"] / temp_trend[kw + "_x"]
+                ).mean()
                 temp_trend[kw] = temp_trend[kw + "_x"] * norm_factor
 
             temp_trend = temp_trend[temp_trend.isnull().any(axis=1)]
             temp_trend["isPartial"] = temp_trend["isPartial_x"]
-            df = pd.concat([df, temp_trend[["date", "isPartial"] + kw_list]], axis=0, sort=False)
+            df = pd.concat(
+                [df, temp_trend[["date", "isPartial"] + kw_list]], axis=0, sort=False
+            )
 
         # Reorder columns in alphabetical order.
         df = df[["date", "isPartial"] + kw_list]
@@ -292,11 +320,15 @@ class Karpet:
             # 2. Create dataframe
             df = pd.DataFrame(data)
             df["date"] = df["timestamp"].dt.date
-            df["has_link"] = df["text"].apply(lambda text: "http://" in text or "https://" in text)
+            df["has_link"] = df["text"].apply(
+                lambda text: "http://" in text or "https://" in text
+            )
 
             return df
 
-        tweets = query_tweets(query=" OR ".join(kw_list), begindate=self.start, lang=lang, limit=limit)
+        tweets = query_tweets(
+            query=" OR ".join(kw_list), begindate=self.start, lang=lang, limit=limit
+        )
 
         return process_tweets(tweets)
 
@@ -323,7 +355,9 @@ class Karpet:
             :rtype: list
             """
 
-            url = f"https://coincodex.com/api/coincodexicos/get_news/{symbol}/{limit}/1/"
+            url = (
+                f"https://coincodex.com/api/coincodexicos/get_news/{symbol}/{limit}/1/"
+            )
             data = self._get_json(url)
 
             return [{"url": d["url"]} for d in data]
@@ -383,7 +417,7 @@ class Karpet:
             """
 
             headers = {
-                "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:69.0) Gecko/20100101 Firefox/69.0",
+                "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:69.0) Gecko/20100101 Firefox/69.0"
             }
             response = requests.get("https://cointelegraph.com/", headers=headers)
             dom = BeautifulSoup(response.text, "lxml")
@@ -415,9 +449,7 @@ class Karpet:
         # Fetch features.
         editors_choice, hot_stories = get_top_news()
         asyncio.run(self._fetch_news_features(editors_choice))
-        print("here")
         asyncio.run(self._fetch_news_features(hot_stories))
-        print("here 2")
 
         return editors_choice, hot_stories
 
@@ -459,26 +491,34 @@ class Karpet:
 
                 # Title.
                 try:
-                    news["title"] = dom.find("meta", {"property": "og:title"})["content"]
+                    news["title"] = dom.find("meta", {"property": "og:title"})[
+                        "content"
+                    ]
                 except:
                     news["title"] = None
 
                 # Date.
                 try:
-                    d = dom.find("meta", {"property": "article:published_time"})["content"]
+                    d = dom.find("meta", {"property": "article:published_time"})[
+                        "content"
+                    ]
                     news["date"] = datetime.strptime(d, "%Y-%m-%dT%H:%M:%S%z")
                 except:
                     news["date"] = None
 
                 # Image.
                 try:
-                    news["image"] = dom.find("meta", {"property": "og:image"})["content"]
+                    news["image"] = dom.find("meta", {"property": "og:image"})[
+                        "content"
+                    ]
                 except:
                     news["image"] = None
 
                 # Description.
                 try:
-                    news["description"] = dom.find("meta", {"property": "og:description"})["content"]
+                    news["description"] = dom.find(
+                        "meta", {"property": "og:description"}
+                    )["content"]
                 except:
                     news["description"] = None
 

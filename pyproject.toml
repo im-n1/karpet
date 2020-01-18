@@ -1,0 +1,31 @@
+[tool.poetry]
+name = "karpet"
+version = "0.3"
+description = "Library for fetching coin/token historical data, trends, tweets and more."
+authors = ["n1 <hrdina.pavel@gmail.com>"]
+readme = "README.rst"
+homepage = "https://github.com/im-n1/karpet"
+classifiers = [
+    "Programming Language :: Python :: 3.6",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3 :: Only",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Libraries",
+]
+
+[tool.poetry.extras]
+twitter = ["twitterscraper"]
+google = ["pytrends"]
+
+[tool.poetry.dependencies]
+python = "^3.6"
+aiohttp = "^3.6.2"
+numpy = "^1.18.1"
+requests = "^2.22.0"
+BeautifulSoup4 = "^4.8.2"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"

@@ -15,7 +15,7 @@
 Karpet
 ======
 Karpet is a tiny library with just a few dependencies
-for fetching coins/tokens metrics data the internet.
+for fetching coins/tokens metrics data from the internet.
 
 It can provide following data:
 
@@ -55,26 +55,24 @@ Usage
 
     from karpet import Karpet
 
-``get_coin_slug()``
-~~~~~~~~~~~~~~~~~~~
-Symbol (ticker) -> coninmarketcap.com URL slug conversion.
-
-.. code-block:: python
-
-    k = Karpet()
-    k.get_coin_slug("BTC")  # bitcoin
-
-``fetch_historical_data()``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``fetch_crypto_historical_data()``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Retrieves historical data.
 
 .. code-block:: python
 
-    k = Karpet(date(2019, 1, 1), date(2019, 5, 1))
-    df = k.fetch_crypto_historical_data(symbol="btc")  # Dataframe with historical data.
+    k = Karpet(date(2019, 1, 1), date(2019, 5, 1), cryptocompare_api_key="...")
+    df = k.fetch_crypto_historical_data(symbol="BTC")  # Dataframe with historical data.
     df.head()
 
-.. image:: https://raw.githubusercontent.com/im-n1/karpet/master/assets/historical_data.png
+                  close conversionSymbol conversionType     high      low     open  volumefrom      volumeto
+    date
+    2019-01-01  3880.15                          direct  3938.75  3696.94  3747.39    45104.29  1.705983e+08
+    2019-01-02  3961.01                          direct  3989.59  3826.29  3880.15    54034.73  2.108546e+08
+    2019-01-03  3835.86                          direct  3965.52  3778.76  3961.01    45585.19  1.764881e+08
+    2019-01-04  3874.06                          direct  3901.65  3783.88  3835.86    44398.90  1.705076e+08
+    2019-01-05  3855.39                          direct  3926.92  3841.13  3874.06    35766.65  1.394385e+08
+
 
 ``fetch_exchanges()``
 ~~~~~~~~~~~~~~~~~~~~~
@@ -82,7 +80,7 @@ Retrieves exchange list.
 
 .. code-block:: python
 
-    k = Karpet()
+    k = Karpet(cryptocompare_api_key="...")
     k.fetch_exchanges("nrg")
     ['DigiFinex', 'KuCoin', 'CryptoBridge', 'Bitbns', 'CoinExchange']
 
@@ -172,6 +170,11 @@ Retrieves top crypto news in 2 categories:
 
 Changelog
 ---------
+0.3
+~~~
+* Migrated to cryptocompare.com API (you need an API key now).
+* Requirements are now managed by Poetry.
+
 0.2.5
 ~~~~~
 * Added ``fetch_top_news()`` method for top crypto news separated in 2 categories.
