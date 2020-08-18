@@ -6,6 +6,7 @@ except:
 
 import asyncio
 import time
+import numpy as np
 from datetime import datetime, timedelta
 
 import aiohttp
@@ -20,20 +21,17 @@ from . import utils
 class Karpet:
 
     quick_search_data = None
-    cryptocompare_api_url = "https://min-api.cryptocompare.com/data"
 
-    def __init__(self, start=None, end=None, cryptocompare_api_key=None):
+    def __init__(self, start=None, end=None):
         """
         Constructor.
 
         :param datetime.date start: History data begining.
         :param datetime.date end: History data end.
-        :param str cryptocompare_api_key: CrtyptoCompare.com API key.
         """
 
         self.start = start
         self.end = end
-        self.cryptocompare_api_key = cryptocompare_api_key
 
     def get_quick_search_data(self):
         """
@@ -80,7 +78,7 @@ class Karpet:
 
     def fetch_crypto_historical_data(self, symbol):
         """
-        Retrieve basic historical information for a specific cryptocurrency from cryptocompare.com
+        Retrieve basic historical information for a specific cryptocurrency from coingecko.com.
 
         Output dataframe has following columns:
 
@@ -104,29 +102,41 @@ class Karpet:
         data = []
         step = 1
         limit = 2000
-        url = f"{self.cryptocompare_api_url}/v2/histoday?fsym={symbol}&tsym=USD&limit={limit}&allData=true"
+        url = f"https://api.coingecko.com/api/v3/coins/{self._get_coin_id(symbol)}/market_chart?vs_currency=usd&days=max"
 
         # Fetch and check the response.
-        response_data = self._get_json(url)
+        data = self._get_json(url)
 
-        if "Success" != response_data["Response"]:
+        if (
+            "prices" not in data
+            or "market_caps" not in data
+            or "total_volumes" not in data
+        ):
             raise Exception("Couldn't download necessary data from the internet.")
 
-        data = response_data["Data"]["Data"]
+        # Assembly the dataframe.
+        prices = np.array(data["prices"])
+        prices = pd.Series(prices[:, 1], index=prices[:, 0], name="price")
+
+        market_caps = np.array(data["market_caps"])
+        market_caps = pd.Series(
+            market_caps[:, 1], index=market_caps[:, 0], name="market_cap"
+        )
+
+        total_volumes = np.array(data["market_caps"])
+        total_volumes = pd.Series(
+            total_volumes[:, 1], index=total_volumes[:, 0], name="total_volume"
+        )
+        df = pd.concat([prices, market_caps, total_volumes], axis=1)
+        df.index = pd.to_datetime(df.index, unit="ms")
+        df.index = df.index.normalize()
 
         # Check if data are limited and if yes drop the unwanted data.
         if self.start:
-            start = utils.date_to_timestamp(self.start)
-            data = list(filter(lambda i: i["time"] >= start, data))
+            df = df[df.index.date >= self.start]
 
         if self.end:
-            end = utils.date_to_timestamp(self.end)
-            data = list(filter(lambda i: i["time"] <= end, data))
-
-        df = pd.DataFrame.from_records(data)
-        df["date"] = pd.to_datetime(df["time"], unit="s")
-        df = df.set_index("date")
-        df = df.drop("time", axis=1)
+            df = df[df.index.date <= self.end]
 
         return df
 
@@ -140,7 +150,7 @@ class Karpet:
         :rtype: list
         """
 
-        url = f"{self.cryptocompare_api_url}/v4/all/exchanges?fsym={symbol}"
+        url = f"https://min-api.cryptocompare.com/data/v4/all/exchanges?fsym={symbol}"
 
         # Fetch and check the response.
         response_data = self._get_json(url)
@@ -183,6 +193,11 @@ class Karpet:
         :return: Pandas dataframe with all results.
         :rtype: pd.DataFrame
         """
+
+        try:
+            _ = TrendReq
+        except NameError:
+            raise Exception("Google extension is not installed - see README file.")
 
         # Validate params.
         if len(kw_list) > 5 or len(kw_list) == 0:
@@ -319,12 +334,20 @@ class Karpet:
 
             # 2. Create dataframe
             df = pd.DataFrame(data)
+            import pdb
+
+            pdb.set_trace()
             df["date"] = df["timestamp"].dt.date
             df["has_link"] = df["text"].apply(
                 lambda text: "http://" in text or "https://" in text
             )
 
             return df
+
+        try:
+            _ = query_tweets
+        except NameError:
+            raise Exception("Twitter extension is not installed - see README file.")
 
         tweets = query_tweets(
             query=" OR ".join(kw_list), begindate=self.start, lang=lang, limit=limit
@@ -435,10 +458,16 @@ class Karpet:
                 news_items = section.find_all(class_="main-news-tabs__item")
                 news = []
 
-                if len(news_items):
+                if news_items:
 
                     for i in news_items:
-                        news.append({"url": i.find("a")["href"]})
+
+                        href = i.find("a")["href"]
+
+                        if not href.startswith("https://") or not href.startswith("//"):
+                            href = "https://cointelegraph.com" + href
+
+                        news.append({"url": href})
 
                 return news
 
@@ -567,3 +596,16 @@ class Karpet:
             return response.json()
         except:
             raise Exception("Couldn't parse downloaded data from the internet.")
+
+    def _get_coin_id(self, symbol):
+
+        url = "https://api.coingecko.com/api/v3/coins/list"
+        response_data = self._get_json(url)
+        symbol = symbol.upper()
+
+        # TODO: possible multiple equal symbols
+        for coin in response_data:
+            if coin["symbol"].upper() == symbol:
+                return coin["id"]
+
+        raise Exception("Couldn't find coin ID.")

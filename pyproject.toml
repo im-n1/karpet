@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "karpet"
-version = "0.3"
+version = "0.3.1"
 description = "Library for fetching coin/token historical data, trends, tweets and more."
 authors = ["n1 <hrdina.pavel@gmail.com>"]
 readme = "README.rst"
@@ -18,13 +18,18 @@ twitter = ["twitterscraper"]
 google = ["pytrends"]
 
 [tool.poetry.dependencies]
-python = "^3.6"
+python = "^3.6.1"
 aiohttp = "^3.6.2"
 numpy = "^1.18.1"
 requests = "^2.22.0"
 BeautifulSoup4 = "^4.8.2"
+pandas = "^1.1.0"
+lxml = "^4.5.2"
 
 [tool.poetry.dev-dependencies]
+pytest = "^6.0.1"
+pytrends = "^4.7.3"
+twitterscraper = "^1.6.1"
 
 [build-system]
 requires = ["poetry>=0.12"]

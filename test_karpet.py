@@ -14,16 +14,14 @@ def test_fetch_crypto_historical_data():
 
     c = Karpet(cryptocompare_api_key=CRYPTOCOMPARE_API_KEY)
 
-    assert 3000 < len(c.fetch_crypto_historical_data("BTC"))
+    assert 1000 < len(c.fetch_crypto_historical_data("BTC"))
 
 
 def test_fetch_crypto_historical_data_limited():
 
-    c = Karpet(
-        date(2019, 1, 1), date(2019, 1, 30), cryptocompare_api_key=CRYPTOCOMPARE_API_KEY
-    )
+    c = Karpet(date(2019, 1, 1), date(2019, 1, 30))
 
-    assert 29 == len(c.fetch_crypto_historical_data("BTC"))
+    assert 30 == len(c.fetch_crypto_historical_data("BTC"))
 
 
 def test_fetch_exchanges():
@@ -47,7 +45,7 @@ def test_fetch_google_trends():
 def test_fetch_tweets():
 
     c = Karpet(date.today() - timedelta(days=1), date.today())
-    df = c.fetch_tweets(["#dash"], "en")
+    df = c.fetch_tweets(["#bitcoin"], "en")
 
     assert len(df) > 0
 
@@ -80,8 +78,8 @@ def test_fetch_top_news():
     k = Karpet()
     editors_choice, hot_stories = k.fetch_top_news()
 
-    assert len(editors_choice) == 5
-    assert len(hot_stories) == 5
+    assert len(editors_choice) >= 4
+    assert len(hot_stories) >= 4
 
     assert "url" in editors_choice[0]
     assert "title" in editors_choice[0]

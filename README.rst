@@ -61,7 +61,7 @@ Retrieves historical data.
 
 .. code-block:: python
 
-    k = Karpet(date(2019, 1, 1), date(2019, 5, 1), cryptocompare_api_key="...")
+    k = Karpet(date(2019, 1, 1), date(2019, 5, 1))
     df = k.fetch_crypto_historical_data(symbol="BTC")  # Dataframe with historical data.
     df.head()
 
@@ -80,7 +80,7 @@ Retrieves exchange list.
 
 .. code-block:: python
 
-    k = Karpet(cryptocompare_api_key="...")
+    k = Karpet()
     k.fetch_exchanges("nrg")
     ['DigiFinex', 'KuCoin', 'CryptoBridge', 'Bitbns', 'CoinExchange']
 
@@ -170,6 +170,11 @@ Retrieves top crypto news in 2 categories:
 
 Changelog
 ---------
+
+0.3.1
+~~~~~
+* Migrated to coingecko.com API (no API key needed anymore).  
+
 0.3
 ~~~
 * Migrated to cryptocompare.com API (you need an API key now).
