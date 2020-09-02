@@ -1,4 +1,5 @@
 from datetime import date, datetime, timedelta
+import pytest
 
 from karpet import Karpet
 
@@ -12,16 +13,27 @@ def get_last_week():
 
 def test_fetch_crypto_historical_data():
 
-    c = Karpet(cryptocompare_api_key=CRYPTOCOMPARE_API_KEY)
+    c = Karpet()
 
-    assert 1000 < len(c.fetch_crypto_historical_data("BTC"))
+    assert 1000 < len(c.fetch_crypto_historical_data(symbol="BTC"))
+
+
+def test_fetch_crypto_historical_data_params():
+
+    c = Karpet()
+
+    with pytest.raises(AttributeError):
+        c.fetch_crypto_historical_data()
+
+    with pytest.raises(AttributeError):
+        c.fetch_crypto_historical_data(symbol="a", id="b")
 
 
 def test_fetch_crypto_historical_data_limited():
 
     c = Karpet(date(2019, 1, 1), date(2019, 1, 30))
 
-    assert 30 == len(c.fetch_crypto_historical_data("BTC"))
+    assert 30 == len(c.fetch_crypto_historical_data(symbol="BTC"))
 
 
 def test_fetch_exchanges():

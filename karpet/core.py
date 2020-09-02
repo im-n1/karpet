@@ -6,16 +6,14 @@ except:
 
 import asyncio
 import time
-import numpy as np
 from datetime import datetime, timedelta
+
+import requests
 
 import aiohttp
 import numpy as np
 import pandas as pd
-import requests
 from bs4 import BeautifulSoup
-
-from . import utils
 
 
 class Karpet:
@@ -76,9 +74,10 @@ class Karpet:
         except:
             raise Exception("Couldn't parse downloaded data from the internet.")
 
-    def fetch_crypto_historical_data(self, symbol):
+    def fetch_crypto_historical_data(self, symbol=None, id=None):
         """
         Retrieve basic historical information for a specific cryptocurrency from coingecko.com.
+        Coin ID can be retreived by get_coin_ids() method.
 
         Output dataframe has following columns:
 
@@ -94,15 +93,30 @@ class Karpet:
         Index is datetime64[ns].
 
         :param str symbol: Coin symbol - i.e. BTC, ETH, ...
+        :param str id: Coin ID (baed on coingecko.com).
         :raises Exception: If data couldn't be download form the internet.
         :return: Dataframe with historical data.
         :rtype: pd.DataFrame
         """
 
+        # Validate input params.
+        if (not symbol and not id) or (symbol and id):
+            raise AttributeError('Please hand "symbol" or "id" param.')
+
+        if symbol:
+            ids = self.get_coin_ids(symbol)
+
+            if 1 < len(ids):
+                raise Exception(
+                    f'Symbol is common for {len(ids)} coins. Please specify "id" param instead.'
+                )
+
+            id = ids[0]
+
+        # Fetch data.
         data = []
         step = 1
-        limit = 2000
-        url = f"https://api.coingecko.com/api/v3/coins/{self._get_coin_id(symbol)}/market_chart?vs_currency=usd&days=max"
+        url = f"https://api.coingecko.com/api/v3/coins/{id}/market_chart?vs_currency=usd&days=max"
 
         # Fetch and check the response.
         data = self._get_json(url)
@@ -140,7 +154,7 @@ class Karpet:
 
         return df
 
-    def fetch_crypto_exchanges(self, symbol):
+    def fetch_crypto_exchanges(self, symbol=None):
         """
         Fetches all exchanges where the given symbol
         is listed.
@@ -597,15 +611,28 @@ class Karpet:
         except:
             raise Exception("Couldn't parse downloaded data from the internet.")
 
-    def _get_coin_id(self, symbol):
+    def get_coin_ids(self, symbol):
+        """
+        Returns coin ID's by coin symbol. There are some coins
+        with the same symbol. The only way to dostiguish between
+        them is to use ID's. These ID's are by coingecko.com.
+
+        So this method return a list of ID's. If you get 2+ ID's
+        you probably want to use `id` param in one of the `fetch_*`
+        methods.
+
+        :param str symbol: Symbol of the coin.
+        :return: List of ID's.
+        :rtype: list
+        """
 
         url = "https://api.coingecko.com/api/v3/coins/list"
         response_data = self._get_json(url)
         symbol = symbol.upper()
+        found_ids = []
 
-        # TODO: possible multiple equal symbols
         for coin in response_data:
             if coin["symbol"].upper() == symbol:
-                return coin["id"]
+                found_ids.append(coin["id"])
 
-        raise Exception("Couldn't find coin ID.")
+        return found_ids

@@ -55,8 +55,8 @@ Usage
 
     from karpet import Karpet
 
-``fetch_crypto_historical_data()``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+fetch_crypto_historical_data()
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Retrieves historical data.
 
 .. code-block:: python
@@ -74,8 +74,8 @@ Retrieves historical data.
     2019-01-05  3855.39                          direct  3926.92  3841.13  3874.06    35766.65  1.394385e+08
 
 
-``fetch_exchanges()``
-~~~~~~~~~~~~~~~~~~~~~
+fetch_exchanges()
+~~~~~~~~~~~~~~~~~
 Retrieves exchange list.
 
 .. code-block:: python
@@ -84,8 +84,8 @@ Retrieves exchange list.
     k.fetch_exchanges("nrg")
     ['DigiFinex', 'KuCoin', 'CryptoBridge', 'Bitbns', 'CoinExchange']
 
-``fetch_tweets()``
-~~~~~~~~~~~~~~~~~~
+fetch_tweets()
+~~~~~~~~~~~~~~
 Retrieves twitter tweets.
 
 .. code-block:: python
@@ -96,8 +96,8 @@ Retrieves twitter tweets.
 
 .. image:: https://raw.githubusercontent.com/im-n1/karpet/master/assets/tweets.png
 
-``fetch_google_trends()``
-~~~~~~~~~~~~~~~~~~~~~~~~~
+fetch_google_trends()
+~~~~~~~~~~~~~~~~~~~~~
 Retrieves Google Trends - in percents for the given date range.
 
 .. code-block:: python
@@ -117,8 +117,8 @@ And with a few lines of code you can get a chart
 
 .. image:: https://raw.githubusercontent.com/im-n1/karpet/master/assets/trends_chart.png
 
-``fetch_news()``
-~~~~~~~~~~~~~~~~
+fetch_news()
+~~~~~~~~~~~~
 Retrieves crypto news.
 
 .. code-block:: python
@@ -135,8 +135,8 @@ Retrieves crypto news.
    }
    news = k.fetch_news("btc", limit=30)  # Gets 30 news.
 
-``fetch_top_news()``
-~~~~~~~~~~~~~~~~~~~~
+fetch_top_news()
+~~~~~~~~~~~~~~~~
 Retrieves top crypto news in 2 categories:
 
 * Editor's choices - articles picked by editors
@@ -167,48 +167,66 @@ Retrieves top crypto news in 2 categories:
       'description': 'Stability around $10,600 for Bitcoin price is ...'  # Truncated.
    }
 
+get_coin_ids()
+~~~~~~~~~~~~~~
+Resolves coin ID's based on the given symbol (there are coins out there with identical symbol).
+
+Use this to get distinctive coin ID which can be used as ``id`` param for
+method ``fetch_crypto_historical_data()``.
+
+.. code-block:: python
+
+    k = Karpet()
+    print(k.get_coin_ids("sta"))
+    ['statera']
+
 
 Changelog
 ---------
 
+0.3.2
+~~~~~
+* new method ``get_coin_ids()``
+* method ``fetch_crypto_historical_data()`` has ``id`` param now
+
 0.3.1
 ~~~~~
-* Migrated to coingecko.com API (no API key needed anymore).  
+* migrated to coingecko.com API (no API key needed anymore)
 
 0.3
 ~~~
-* Migrated to cryptocompare.com API (you need an API key now).
-* Requirements are now managed by Poetry.
+* migrated to cryptocompare.com API (you need an API key now)
+* requirements are now managed by Poetry
 
 0.2.5
 ~~~~~
-* Added ``fetch_top_news()`` method for top crypto news separated in 2 categories.
+* added ``fetch_top_news()`` method for top crypto news separated in 2 categories
 
 0.2.4
 ~~~~~
-* ``fetch_news()`` adds new "description" item and renames "image_url" to "image".
-* All ``fetch_news()`` item properties are now presented even if they are ``None``.
+* ``fetch_news()`` adds new "description" item and renames "image_url" to "image"
+* all ``fetch_news()`` item properties are now presented even if they are ``None``
 
 0.2.3
 ~~~~~
-* Simplified import from ``from karpet.karpet import Karpet`` to ``from karpet import Karpet``.
+* simplified import from ``from karpet.karpet import Karpet`` to ``from karpet import Karpet``
 
 0.2.2
 ~~~~~
-* Added ``fetch_news()`` method for retrieving crypto news.
+* added ``fetch_news()`` method for retrieving crypto news
 
 0.2.1
 ~~~~~
-* Added ``fetch_exchanges()`` method for retrieving symbol exchange list.
-* Removed obsolete library dependency.
+* added ``fetch_exchanges()`` method for retrieving symbol exchange list
+* removed obsolete library dependency
 
 0.2
 ~~~
-* Twitter scraping added.
+* twitter scraping added
 
 0.1
 ~~~
-* Initial release.
+* initial release
 
 Credits
 -------
