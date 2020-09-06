@@ -81,14 +81,9 @@ class Karpet:
 
         Output dataframe has following columns:
 
-        * close
-        * conversionSymbol
-        * conversionType
-        * high
-        * low
-        * open
-        * volumefrom
-        * volumeto
+        * price
+        * market_cap
+        * total_volume
 
         Index is datetime64[ns].
 

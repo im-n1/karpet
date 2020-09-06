@@ -62,26 +62,25 @@ Retrieves historical data.
 .. code-block:: python
 
     k = Karpet(date(2019, 1, 1), date(2019, 5, 1))
-    df = k.fetch_crypto_historical_data(symbol="BTC")  # Dataframe with historical data.
+    df = k.fetch_crypto_historical_data(symbol="ETH")  # Dataframe with historical data.
     df.head()
 
-                  close conversionSymbol conversionType     high      low     open  volumefrom      volumeto
-    date
-    2019-01-01  3880.15                          direct  3938.75  3696.94  3747.39    45104.29  1.705983e+08
-    2019-01-02  3961.01                          direct  3989.59  3826.29  3880.15    54034.73  2.108546e+08
-    2019-01-03  3835.86                          direct  3965.52  3778.76  3961.01    45585.19  1.764881e+08
-    2019-01-04  3874.06                          direct  3901.65  3783.88  3835.86    44398.90  1.705076e+08
-    2019-01-05  3855.39                          direct  3926.92  3841.13  3874.06    35766.65  1.394385e+08
+                     price   market_cap total_volume
+    2019-01-01  131.458725  1.36773e+10  1.36773e+10
+    2019-01-02  138.144802  1.43923e+10  1.43923e+10
+    2019-01-03  152.860453  1.59222e+10  1.59222e+10
+    2019-01-04  146.730599  1.52777e+10  1.52777e+10
+    2019-01-05  153.056567  1.59408e+10  1.59408e+10
 
 
-fetch_exchanges()
-~~~~~~~~~~~~~~~~~
+fetch_crypto_exchanges()
+~~~~~~~~~~~~~~~~~~~~~~~~
 Retrieves exchange list.
 
 .. code-block:: python
 
     k = Karpet()
-    k.fetch_exchanges("nrg")
+    k.fetch_crypto_exchanges("nrg")
     ['DigiFinex', 'KuCoin', 'CryptoBridge', 'Bitbns', 'CoinExchange']
 
 fetch_tweets()
