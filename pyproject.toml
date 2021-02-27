@@ -23,7 +23,7 @@ aiohttp = "^3.6.2"
 numpy = "^1.18.1"
 requests = "^2.22.0"
 BeautifulSoup4 = "^4.8.2"
-pandas = "^1.1.0"
+pandas = "^1.1.5"
 lxml = "^4.5.2"
 
 [tool.poetry.dev-dependencies]

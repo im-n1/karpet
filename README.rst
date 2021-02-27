@@ -83,17 +83,17 @@ Retrieves exchange list.
     k.fetch_crypto_exchanges("nrg")
     ['DigiFinex', 'KuCoin', 'CryptoBridge', 'Bitbns', 'CoinExchange']
 
-fetch_tweets()
-~~~~~~~~~~~~~~
-Retrieves twitter tweets.
+.. fetch_tweets()
+.. ~~~~~~~~~~~~~~
+.. Retrieves twitter tweets.
 
-.. code-block:: python
+.. .. code-block:: python
 
-    k = Karpet(date(2019, 1, 1), date(2019, 5, 1))
-    df = k.fetch_tweets(kw_list=["bitcoin"], lang="en")  # Dataframe with tweets.
-    df.head()
+..     k = Karpet(date(2019, 1, 1), date(2019, 5, 1))
+..     df = k.fetch_tweets(kw_list=["bitcoin"], lang="en")  # Dataframe with tweets.
+..     df.head()
 
-.. image:: https://raw.githubusercontent.com/im-n1/karpet/master/assets/tweets.png
+.. .. image:: https://raw.githubusercontent.com/im-n1/karpet/master/assets/tweets.png
 
 fetch_google_trends()
 ~~~~~~~~~~~~~~~~~~~~~

@@ -54,12 +54,12 @@ def test_fetch_google_trends():
     assert len(df[df["bitcoin"] == 100.0]) == 1
 
 
-def test_fetch_tweets():
+# def test_fetch_tweets():
 
-    c = Karpet(date.today() - timedelta(days=1), date.today())
-    df = c.fetch_tweets(["#bitcoin"], "en")
+#     c = Karpet(date.today() - timedelta(days=1), date.today())
+#     df = c.fetch_tweets(["#bitcoin"], "en")
 
-    assert len(df) > 0
+#     assert len(df) > 0
 
 
 def test_fetch_news():

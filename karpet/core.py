@@ -287,82 +287,82 @@ class Karpet:
 
         return df.sort_values("date").reset_index(drop=True)
 
-    def fetch_tweets(self, kw_list, lang, limit=None):
-        """
-        Scrapes Twitter without any limits and  returns dataframe with the
-        following structure
+    # def fetch_tweets(self, kw_list, lang, limit=None):
+    #     """
+    #     Scrapes Twitter without any limits and  returns dataframe with the
+    #     following structure
 
-        * fullname
-        * id
-        * likes
-        * replies
-        * retweets
-        * text
-        * timestamp
-        * url
-        * user
-        * date
-        * has_link
+    #     * fullname
+    #     * id
+    #     * likes
+    #     * replies
+    #     * retweets
+    #     * text
+    #     * timestamp
+    #     * url
+    #     * user
+    #     * date
+    #     * has_link
 
-        :param list kw_list: List of keywords to search for. Will be joined with "OR" operator.
-        :param str lang: Language of tweets to search in.
-        :param int limit: Limit search results. Might get really big and slow so this should help.
-        :return: Pandas dataframe with all search results (tweets).
-        :rtype: pd.DataFrame
-        """
+    #     :param list kw_list: List of keywords to search for. Will be joined with "OR" operator.
+    #     :param str lang: Language of tweets to search in.
+    #     :param int limit: Limit search results. Might get really big and slow so this should help.
+    #     :return: Pandas dataframe with all search results (tweets).
+    #     :rtype: pd.DataFrame
+    #     """
 
-        def process_tweets(tweets):
-            """
-            Cleans up tweets and returns dataframe with the
-            following structure
+    #     def process_tweets(tweets):
+    #         """
+    #         Cleans up tweets and returns dataframe with the
+    #         following structure
 
-            * fullname
-            * id
-            * likes
-            * replies
-            * retweets
-            * text
-            * timestamp
-            * url
-            * user
-            * date
-            * has_link
+    #         * fullname
+    #         * id
+    #         * likes
+    #         * replies
+    #         * retweets
+    #         * text
+    #         * timestamp
+    #         * url
+    #         * user
+    #         * date
+    #         * has_link
 
-            :param list tweets: List of dicts of tweets data.
-            :return: Returns dataframe with all the scraped tweets (no index).
-            :rtype: pd.DataFrame
-            """
+    #         :param list tweets: List of dicts of tweets data.
+    #         :return: Returns dataframe with all the scraped tweets (no index).
+    #         :rtype: pd.DataFrame
+    #         """
 
-            # 1. Clean up.
-            data = []
+    #         # 1. Clean up.
+    #         data = []
 
-            for t in tweets:
-                d = t.__dict__
-                del d["html"]
-                data.append(d)
+    #         for t in tweets:
+    #             d = t.__dict__
+    #             del d["html"]
+    #             data.append(d)
 
-            # 2. Create dataframe
-            df = pd.DataFrame(data)
-            import pdb
+    #         # 2. Create dataframe
+    #         df = pd.DataFrame(data)
+    #         # import pdb
 
-            pdb.set_trace()
-            df["date"] = df["timestamp"].dt.date
-            df["has_link"] = df["text"].apply(
-                lambda text: "http://" in text or "https://" in text
-            )
+    #         # pdb.set_trace()
+    #         df["date"] = df["timestamp"].dt.date
+    #         df["has_link"] = df["text"].apply(
+    #             lambda text: "http://" in text or "https://" in text
+    #         )
 
-            return df
+    #         return df
 
-        try:
-            _ = query_tweets
-        except NameError:
-            raise Exception("Twitter extension is not installed - see README file.")
+    #     try:
+    #         _ = query_tweets
+    #     except NameError:
+    #         raise Exception("Twitter extension is not installed - see README file.")
 
-        tweets = query_tweets(
-            query=" OR ".join(kw_list), begindate=self.start, lang=lang, limit=limit
-        )
+    #     tweets = query_tweets(
+    #         query=" OR ".join(kw_list), begindate=self.start, lang=lang, limit=limit
+    #     )
 
-        return process_tweets(tweets)
+    #     return process_tweets(tweets)
 
     def fetch_news(self, symbol, limit=10):
         """
@@ -454,40 +454,43 @@ class Karpet:
             response = requests.get("https://cointelegraph.com/", headers=headers)
             dom = BeautifulSoup(response.text, "lxml")
 
-            def parse_section_news(section):
+            def parse_news(news_items):
                 """
-                Parse section with news. Section contains of titles and
-                links to the news where only links are parsed out.
+                Parse news URL from news LI HTML elements.
 
-                :param object section: BeautifulSoap element object of the section.
-                :return: List of news objects - {"url": "..."}.
-                :rtype: list
+                :param list news_items: List of LI HTML elements where A HTML elements sits.
+                :return: List of news dicts with "url" key.
+                :rtype: dict
                 """
 
-                news_items = section.find_all(class_="main-news-tabs__item")
                 news = []
 
-                if news_items:
+                for i in news_items:
 
-                    for i in news_items:
-
+                    try:
                         href = i.find("a")["href"]
+                    except AttributeError:
+                        # A without href attribute.
+                        continue
 
-                        if not href.startswith("https://") or not href.startswith("//"):
-                            href = "https://cointelegraph.com" + href
+                    if not href.startswith("https://") or not href.startswith("//"):
+                        href = "https://cointelegraph.com" + href
 
-                        news.append({"url": href})
+                    news.append({"url": href})
 
                 return news
 
-            editors_choice, hot_stories = dom.find_all(class_="main-news-tabs__list")
+            container = dom.find(class_="main-news-controls__list")
+            news = container.find_all("li")
 
-            return parse_section_news(editors_choice), parse_section_news(hot_stories)
+            return parse_news(news[:5]), parse_news(news[5:])
 
         # Fetch features.
         editors_choice, hot_stories = get_top_news()
         asyncio.run(self._fetch_news_features(editors_choice))
         asyncio.run(self._fetch_news_features(hot_stories))
+
+        print(editors_choice, hot_stories)
 
         return editors_choice, hot_stories
 
