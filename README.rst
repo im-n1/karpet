@@ -183,6 +183,12 @@ method ``fetch_crypto_historical_data()``.
 Changelog
 ---------
 
+0.3.3.
+~~~~~~
+* removed twitter integration - twitterscraper library is not up to date
+* fixed news fetching
+
+
 0.3.2
 ~~~~~
 * new method ``get_coin_ids()``
