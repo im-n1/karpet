@@ -190,7 +190,7 @@ available.
 .. code-block:: python
 
     k = Karpet()
-    print(k.get_basic_data("sta"))
+    print(k.get_basic_data(id="ethereum"))
     {
         'name': 'Ethereum',
         'current_price': 1579.4271687603093,
