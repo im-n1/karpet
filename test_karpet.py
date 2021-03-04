@@ -106,3 +106,23 @@ def test_fetch_top_news():
 
     if hot_stories[0]["date"] is not None:
         assert isinstance(hot_stories[0]["date"], datetime)
+
+
+def test_get_basic_data():
+
+    k = Karpet()
+    data = k.get_basic_data(id="ethereum")
+
+    assert isinstance(data["name"], str)
+    assert isinstance(data["current_price"], float)
+    assert isinstance(data["market_cap"], float)
+    assert isinstance(data["reddit_average_posts_48h"], float)
+    assert isinstance(data["reddit_average_comments_48h"], float)
+    assert isinstance(data["reddit_subscribers"], int)
+    assert isinstance(data["reddit_accounts_active_48h"], float)
+    assert isinstance(data["forks"], int)
+    assert isinstance(data["stars"], int)
+    assert isinstance(data["total_issues"], int)
+    assert isinstance(data["closed_issues"], int)
+    assert isinstance(data["pull_request_contributors"], int)
+    assert isinstance(data["commit_count_4_weeks"], int)

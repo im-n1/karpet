@@ -180,8 +180,41 @@ method ``fetch_crypto_historical_data()``.
     ['statera']
 
 
+get_basic_data()
+~~~~~~~~~~~~~~~~
+Fetches coin/token basic data like:
+
+``open_issues`` is only provided if ``total_issues`` and ``closed_issues`` are
+available.
+
+.. code-block:: python
+
+    k = Karpet()
+    print(k.get_basic_data("sta"))
+    {
+        'name': 'Ethereum',
+        'current_price': 1579.4271687603093,
+        'market_cap': 182133382817.63593,
+        'reddit_average_posts_48h': 150.083,
+        'reddit_average_comments_48h': 150.083,
+        'reddit_subscribers': 704486,
+        'reddit_accounts_active_48h': 2950.92307692308,
+        'forks': 10546,
+        'stars': 28621,
+        'total_issues': 5366,
+        'closed_issues': 5183,
+        'pull_request_contributors': 505,
+        'commit_count_4_weeks': 80,
+        'open_issues': 183
+    }
+
+
 Changelog
 ---------
+
+0.4
+~~~
+* new method ``get_basic_data()``
 
 0.3.3.
 ~~~~~~

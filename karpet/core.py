@@ -5,15 +5,14 @@ except:
     pass
 
 import asyncio
+from datetime import date, datetime, timedelta
 import time
-from datetime import datetime, timedelta
-
-import requests
 
 import aiohttp
+from bs4 import BeautifulSoup
 import numpy as np
 import pandas as pd
-from bs4 import BeautifulSoup
+import requests
 
 
 class Karpet:
@@ -94,23 +93,10 @@ class Karpet:
         :rtype: pd.DataFrame
         """
 
-        # Validate input params.
-        if (not symbol and not id) or (symbol and id):
-            raise AttributeError('Please hand "symbol" or "id" param.')
-
-        if symbol:
-            ids = self.get_coin_ids(symbol)
-
-            if 1 < len(ids):
-                raise Exception(
-                    f'Symbol is common for {len(ids)} coins. Please specify "id" param instead.'
-                )
-
-            id = ids[0]
+        id = self._get_coin_id_from_params(symbol, id)
 
         # Fetch data.
         data = []
-        step = 1
         url = f"https://api.coingecko.com/api/v3/coins/{id}/market_chart?vs_currency=usd&days=max"
 
         # Fetch and check the response.
@@ -394,31 +380,31 @@ class Karpet:
 
             return [{"url": d["url"]} for d in data]
 
-        def get_coin_slug(symbol):
-            """
-            Determines coin coincodex.com URL slug for the given
-            coin symbol.
+        # def get_coin_slug(symbol):
+        #     """
+        #     Determines coin coincodex.com URL slug for the given
+        #     coin symbol.
 
-            :param str symbol: Coin symbol (BTC, ETH, ...)
-            :return: URL slug or None if not found.
-            :rtype: str or None
-            """
+        #     :param str symbol: Coin symbol (BTC, ETH, ...)
+        #     :return: URL slug or None if not found.
+        #     :rtype: str or None
+        #     """
 
-            url = "https://coincodex.com/apps/coincodex/cache/all_coins.json"
+        #     url = "https://coincodex.com/apps/coincodex/cache/all_coins.json"
 
-            try:
-                response = requests.get(url)
-            except:
-                raise Exception("Couldn't download necessary data from the internet.")
+        #     try:
+        #         response = requests.get(url)
+        #     except:
+        #         raise Exception("Couldn't download necessary data from the internet.")
 
-            try:
-                data = response.json()
-            except:
-                raise Exception("Couldn't parse downloaded data from the internet.")
+        #     try:
+        #         data = response.json()
+        #     except:
+        #         raise Exception("Couldn't parse downloaded data from the internet.")
 
-            for c in data:
-                if c["symbol"].upper() == symbol.upper():
-                    return c["shortname"]
+        #     for c in data:
+        #         if c["symbol"].upper() == symbol.upper():
+        #             return c["shortname"]
 
         # Fetch features.
         news = get_news(symbol, limit)
@@ -493,6 +479,101 @@ class Karpet:
         print(editors_choice, hot_stories)
 
         return editors_choice, hot_stories
+
+    def get_coin_ids(self, symbol):
+        """
+        Returns coin ID's by coin symbol. There are some coins
+        with the same symbol. The only way to dostiguish between
+        them is to use ID's. These ID's are by coingecko.com.
+
+        So this method return a list of ID's. If you get 2+ ID's
+        you probably want to use `id` param in one of the `fetch_*`
+        methods.
+
+        :param str symbol: Symbol of the coin.
+        :return: List of ID's.
+        :rtype: list
+        """
+
+        url = "https://api.coingecko.com/api/v3/coins/list"
+        response_data = self._get_json(url)
+        symbol = symbol.upper()
+        found_ids = []
+
+        for coin in response_data:
+            if coin["symbol"].upper() == symbol:
+                found_ids.append(coin["id"])
+
+        return found_ids
+
+    def get_basic_data(self, symbol=None, id=None):
+        """
+        Fetches coin/token basic data like:
+
+        - name
+        - current_price
+        - market_cap
+        - reddit_average_posts_48h
+        - reddit_average_comments_48h
+        - reddit_subscribers
+        - reddit_accounts_active_48h
+        - forks
+        - stars
+        - total_issues
+        - closed_issues
+        - pull_request_contributors
+        - commit_count_4_weeks
+        - open_issues
+
+        :param str symbol: Coin symbol - i.e. BTC, ETH, ...
+        :param str id: Coin ID (baed on coingecko.com).
+        :raises Exception: If data couldn't be download form the internet.
+        :return: Baic data as a dict.
+        :rtype: dict
+        """
+
+        id = self._get_coin_id_from_params(symbol, id)
+
+        data = self._get_json(
+            f"https://api.coingecko.com/api/v3/coins/{id}/history?date={date.today().strftime('%d-%m-%Y')}"
+        )
+
+        to_return = {
+            "name": data["name"],
+            "current_price": data["market_data"]["current_price"]["usd"],
+            "market_cap": data["market_data"]["market_cap"]["usd"],
+            "reddit_average_posts_48h": data["community_data"][
+                "reddit_average_comments_48h"
+            ],
+            "reddit_average_comments_48h": data["community_data"][
+                "reddit_average_comments_48h"
+            ],
+            "reddit_subscribers": data["community_data"]["reddit_subscribers"],
+            "reddit_accounts_active_48h": float(
+                data["community_data"]["reddit_accounts_active_48h"]
+            ),
+            "forks": data["developer_data"]["forks"],
+            "stars": data["developer_data"]["stars"],
+            "total_issues": data["developer_data"]["total_issues"],
+            "closed_issues": data["developer_data"]["closed_issues"],
+            "pull_request_contributors": data["developer_data"][
+                "pull_request_contributors"
+            ],
+            "commit_count_4_weeks": data["developer_data"]["commit_count_4_weeks"],
+        }
+
+        if (
+            data["developer_data"]["total_issues"]
+            and data["developer_data"]["closed_issues"]
+        ):
+            to_return["open_issues"] = (
+                data["developer_data"]["total_issues"]
+                - data["developer_data"]["closed_issues"]
+            )
+        else:
+            to_return["open_issues"] = None
+
+        return to_return
 
     async def _fetch_news_features(self, news):
         """
@@ -609,28 +690,31 @@ class Karpet:
         except:
             raise Exception("Couldn't parse downloaded data from the internet.")
 
-    def get_coin_ids(self, symbol):
+    def _get_coin_id_from_params(self, symbol=None, id=None):
         """
-        Returns coin ID's by coin symbol. There are some coins
-        with the same symbol. The only way to dostiguish between
-        them is to use ID's. These ID's are by coingecko.com.
+        Handles incoming symbol and id params and retuirns
 
-        So this method return a list of ID's. If you get 2+ ID's
-        you probably want to use `id` param in one of the `fetch_*`
-        methods.
-
-        :param str symbol: Symbol of the coin.
-        :return: List of ID's.
-        :rtype: list
+        :param str symbol: Coin symbol - i.e. BTC, ETH, ...
+        :param str id: Coin ID (baed on coingecko.com).
+        :raises AttributeError: If symbol and id params are empty.
+        :return: Coin ID.
+        :rtype: str
         """
 
-        url = "https://api.coingecko.com/api/v3/coins/list"
-        response_data = self._get_json(url)
-        symbol = symbol.upper()
-        found_ids = []
+        # Validate input params.
+        if (not symbol and not id) or (symbol and id):
+            raise AttributeError('Please hand "symbol" or "id" param.')
 
-        for coin in response_data:
-            if coin["symbol"].upper() == symbol:
-                found_ids.append(coin["id"])
+        # ID.
+        if id:
+            return id
 
-        return found_ids
+        # Symbol.
+        ids = self.get_coin_ids(symbol)
+
+        if 1 < len(ids):
+            raise Exception(
+                f'Symbol is common for {len(ids)} coins. Please specify "id" param instead.'
+            )
+
+        return ids[0]
