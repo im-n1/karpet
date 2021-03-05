@@ -524,6 +524,9 @@ class Karpet:
         - pull_request_contributors
         - commit_count_4_weeks
         - open_issues
+        - year_low
+        - year_high
+        - yoy_change
 
         :param str symbol: Coin symbol - i.e. BTC, ETH, ...
         :param str id: Coin ID (baed on coingecko.com).
@@ -536,6 +539,17 @@ class Karpet:
 
         data = self._get_json(
             f"https://api.coingecko.com/api/v3/coins/{id}/history?date={date.today().strftime('%d-%m-%Y')}"
+        )
+        data_chart = self._get_json(
+            f"https://api.coingecko.com/api/v3/coins/{id}/market_chart?vs_currency=usd&days=365"
+        )
+        sorted_chart_by_price = sorted(
+            data_chart["prices"],
+            key=lambda i: i[1],  # i is a list of [timestamp, price]
+        )
+        sorted_chart_by_date = sorted(
+            data_chart["prices"],
+            key=lambda i: i[0],  # i is a list of [timestamp, price]
         )
 
         to_return = {
@@ -560,6 +574,10 @@ class Karpet:
                 "pull_request_contributors"
             ],
             "commit_count_4_weeks": data["developer_data"]["commit_count_4_weeks"],
+            "year_low": sorted_chart_by_price[0][1],
+            "year_high": sorted_chart_by_price[-1][1],
+            "yoy_change": 100
+            * (sorted_chart_by_date[-1][1] / sorted_chart_by_date[0][1] - 1),
         }
 
         if (

@@ -206,11 +206,18 @@ available.
         'pull_request_contributors': 505,
         'commit_count_4_weeks': 80,
         'open_issues': 183
+        'year_low': 110.5978978308351,
+        'year_high': 1969.9797177628186,
+        'yoy_change': 551.9432548470326  # growth/drop in percents
     }
 
 
 Changelog
 ---------
+
+0.4.1
+~~~~~
+* new data in ``get_basic_data()`` method - ``year_low``, ``year_high``, ``yoy_change``
 
 0.4
 ~~~
