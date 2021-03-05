@@ -126,3 +126,6 @@ def test_get_basic_data():
     assert isinstance(data["closed_issues"], int)
     assert isinstance(data["pull_request_contributors"], int)
     assert isinstance(data["commit_count_4_weeks"], int)
+    assert isinstance(data["year_low"], float)
+    assert isinstance(data["year_high"], float)
+    assert isinstance(data["yoy_change"], float)

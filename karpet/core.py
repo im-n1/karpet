@@ -624,43 +624,46 @@ class Karpet:
             :param object news: News object.
             """
 
-            async with session.get(news["url"]) as response:
+            try:
+                async with session.get(news["url"]) as response:
 
-                html = await response.text()
-                dom = BeautifulSoup(html, features="lxml")
+                    html = await response.text()
+                    dom = BeautifulSoup(html, features="lxml")
 
-                # Title.
-                try:
-                    news["title"] = dom.find("meta", {"property": "og:title"})[
-                        "content"
-                    ]
-                except:
-                    news["title"] = None
+                    # Title.
+                    try:
+                        news["title"] = dom.find("meta", {"property": "og:title"})[
+                            "content"
+                        ]
+                    except:
+                        news["title"] = None
 
-                # Date.
-                try:
-                    d = dom.find("meta", {"property": "article:published_time"})[
-                        "content"
-                    ]
-                    news["date"] = datetime.strptime(d, "%Y-%m-%dT%H:%M:%S%z")
-                except:
-                    news["date"] = None
+                    # Date.
+                    try:
+                        d = dom.find("meta", {"property": "article:published_time"})[
+                            "content"
+                        ]
+                        news["date"] = datetime.strptime(d, "%Y-%m-%dT%H:%M:%S%z")
+                    except:
+                        news["date"] = None
 
-                # Image.
-                try:
-                    news["image"] = dom.find("meta", {"property": "og:image"})[
-                        "content"
-                    ]
-                except:
-                    news["image"] = None
+                    # Image.
+                    try:
+                        news["image"] = dom.find("meta", {"property": "og:image"})[
+                            "content"
+                        ]
+                    except:
+                        news["image"] = None
 
-                # Description.
-                try:
-                    news["description"] = dom.find(
-                        "meta", {"property": "og:description"}
-                    )["content"]
-                except:
-                    news["description"] = None
+                    # Description.
+                    try:
+                        news["description"] = dom.find(
+                            "meta", {"property": "og:description"}
+                        )["content"]
+                    except:
+                        news["description"] = None
+            except aiohttp.ClientResponseError:
+                pass
 
         async with aiohttp.ClientSession() as session:
             await fetch_all(session, news)
@@ -679,7 +682,7 @@ class Karpet:
         filtered_news = []
 
         for n in news:
-            if not n["date"]:
+            if "date" not in n or not n["date"]:
                 continue
 
             filtered_news.append(n)
