@@ -215,6 +215,10 @@ available.
 Changelog
 ---------
 
+0.4.2.
+~~~~~~
+* fixed minor bugs
+
 0.4.1
 ~~~~~
 * new data in ``get_basic_data()`` method - ``year_low``, ``year_high``, ``yoy_change``
