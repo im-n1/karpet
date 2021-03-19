@@ -564,7 +564,7 @@ class Karpet:
             ],
             "reddit_subscribers": data["community_data"]["reddit_subscribers"],
             "reddit_accounts_active_48h": float(
-                data["community_data"]["reddit_accounts_active_48h"]
+                data["community_data"]["reddit_accounts_active_48h"] or 0
             ),
             "forks": data["developer_data"]["forks"],
             "stars": data["developer_data"]["stars"],
