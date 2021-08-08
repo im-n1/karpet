@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "karpet"
-version = "0.4.2"
+version = "0.4.3"
 description = "Library for fetching coin/token historical data, trends and more."
 authors = ["n1 <hrdina.pavel@gmail.com>"]
 readme = "README.rst"
