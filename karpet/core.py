@@ -513,6 +513,7 @@ class Karpet:
         - name
         - current_price
         - market_cap
+        - rank
         - reddit_average_posts_48h
         - reddit_average_comments_48h
         - reddit_subscribers
@@ -537,9 +538,7 @@ class Karpet:
 
         id = self._get_coin_id_from_params(symbol, id)
 
-        data = self._get_json(
-            f"https://api.coingecko.com/api/v3/coins/{id}/history?date={date.today().strftime('%d-%m-%Y')}"
-        )
+        data = self._get_json(f"https://api.coingecko.com/api/v3/coins/{id}")
         data_chart = self._get_json(
             f"https://api.coingecko.com/api/v3/coins/{id}/market_chart?vs_currency=usd&days=365"
         )
@@ -556,6 +555,7 @@ class Karpet:
             "name": data["name"],
             "current_price": data["market_data"]["current_price"]["usd"],
             "market_cap": data["market_data"]["market_cap"]["usd"],
+            "rank": data["market_data"]["market_cap_rank"],
             "reddit_average_posts_48h": data["community_data"][
                 "reddit_average_comments_48h"
             ],
@@ -580,6 +580,7 @@ class Karpet:
             * (sorted_chart_by_date[-1][1] / sorted_chart_by_date[0][1] - 1),
         }
 
+        # Calculate open issues.
         if (
             data["developer_data"]["total_issues"]
             and data["developer_data"]["closed_issues"]

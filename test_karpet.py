@@ -115,7 +115,8 @@ def test_get_basic_data():
 
     assert isinstance(data["name"], str)
     assert isinstance(data["current_price"], float)
-    assert isinstance(data["market_cap"], float)
+    assert isinstance(data["market_cap"], int)
+    assert isinstance(data["rank"], int)
     assert isinstance(data["reddit_average_posts_48h"], float)
     assert isinstance(data["reddit_average_comments_48h"], float)
     assert isinstance(data["reddit_subscribers"], int)
@@ -124,6 +125,7 @@ def test_get_basic_data():
     assert isinstance(data["stars"], int)
     assert isinstance(data["total_issues"], int)
     assert isinstance(data["closed_issues"], int)
+    assert isinstance(data["open_issues"], int)
     assert isinstance(data["pull_request_contributors"], int)
     assert isinstance(data["commit_count_4_weeks"], int)
     assert isinstance(data["year_low"], float)
