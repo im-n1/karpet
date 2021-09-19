@@ -131,3 +131,9 @@ def test_get_basic_data():
     assert isinstance(data["year_low"], float)
     assert isinstance(data["year_high"], float)
     assert isinstance(data["yoy_change"], float)
+
+
+def test_get_coin_ids():
+
+    k = Karpet()
+    assert k.get_coin_ids("BTC") == ["bitcoin"]
