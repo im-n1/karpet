@@ -36,7 +36,6 @@ need to install dependencies you don't need. Therefore this library utilizes
 extras which install optional dependencies:
 
 * for Google trends - google
-* for Twitter scraping - twitter
 
 Usage
 -----
@@ -45,9 +44,7 @@ Usage
 .. code-block:: bash
 
    pip install karpet  # Basics only
-   pip install karpet[twitter]  # For Twitter scraping
    pip install karpet[google]  # For Google trends
-   pip install karpet[twitter,google]  # All features
 
 2. Import the library class first.
 
@@ -82,18 +79,6 @@ Retrieves exchange list.
     k = Karpet()
     k.fetch_crypto_exchanges("nrg")
     ['DigiFinex', 'KuCoin', 'CryptoBridge', 'Bitbns', 'CoinExchange']
-
-.. fetch_tweets()
-.. ~~~~~~~~~~~~~~
-.. Retrieves twitter tweets.
-
-.. .. code-block:: python
-
-..     k = Karpet(date(2019, 1, 1), date(2019, 5, 1))
-..     df = k.fetch_tweets(kw_list=["bitcoin"], lang="en")  # Dataframe with tweets.
-..     df.head()
-
-.. .. image:: https://raw.githubusercontent.com/im-n1/karpet/master/assets/tweets.png
 
 fetch_google_trends()
 ~~~~~~~~~~~~~~~~~~~~~
@@ -215,6 +200,10 @@ available.
 
 Changelog
 ---------
+
+0.4.4
+~~~~~
+- remove obsolete parts of the code and some dependencies
 
 0.4.3
 ~~~~~
