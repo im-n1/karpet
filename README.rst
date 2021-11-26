@@ -201,9 +201,13 @@ available.
 Changelog
 ---------
 
+0.4.5
+~~~~~
+- fixed dependencies
+
 0.4.4
 ~~~~~
-- remove obsolete parts of the code and some dependencies
+- removed obsolete parts of the code and some dependencies
 
 0.4.3
 ~~~~~

@@ -267,7 +267,7 @@ six = ">=1.5"
 name = "pytrends"
 version = "4.7.3"
 description = "Pseudo API for Google Trends"
-category = "dev"
+category = "main"
 optional = false
 python-versions = "*"
 
@@ -373,12 +373,12 @@ docs = ["sphinx", "jaraco.packaging (>=8.2)", "rst.linker (>=1.9)"]
 testing = ["pytest (>=4.6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-cov", "pytest-enabler (>=1.0.1)", "jaraco.itertools", "func-timeout", "pytest-black (>=0.3.7)", "pytest-mypy"]
 
 [extras]
-google = []
+google = ["pytrends"]
 
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.6.1"
-content-hash = "52a99ceda42026b185947d8c25704d04ee4114662051e81f7266ef9735825aa2"
+content-hash = "93d71016e949c4059b15e5b64f17f4fbc0ccb700400ccc70d936ee72b59280ac"
 
 [metadata.files]
 aiohttp = [
