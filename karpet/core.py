@@ -450,6 +450,8 @@ class Karpet:
         - year_low
         - year_high
         - yoy_change
+        - price_change_24
+        - price_change_24_percents
 
         :param str symbol: Coin symbol - i.e. BTC, ETH, ...
         :param str id: Coin ID (baed on coingecko.com).
@@ -498,8 +500,9 @@ class Karpet:
             "commit_count_4_weeks": data["developer_data"]["commit_count_4_weeks"],
             "year_low": sorted_chart_by_price[0][1],
             "year_high": sorted_chart_by_price[-1][1],
-            "yoy_change": 100
-            * (sorted_chart_by_date[-1][1] / sorted_chart_by_date[0][1] - 1),
+            "yoy_change": 100 * (sorted_chart_by_date[-1][1] / sorted_chart_by_date[0][1] - 1),
+            "price_change_24": data["market_data"]["price_change_24h"],
+            "price_change_24_percents": data["market_data"]["price_change_percentage_24h"],
         }
 
         # Calculate open issues.

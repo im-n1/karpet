@@ -194,12 +194,39 @@ available.
         'total_issues': 5760,
         'year_high': 4182.790285752286,
         'year_low': 321.0774351739628,
-        'yoy_change': 695.9225871929757  # growth/drop in percents
+        'yoy_change': 695.9225871929757,  # growth/drop in percents
+        'price_change_24': 120.1,
+        'price_change_24_percents': 1.23
     }
 
+get_quick_search_data()
+~~~~~~~~~~~~~~~~~~~~~~~
+Lists all coins/tokes with some basic info.
+
+.. code-block:: python
+
+    k = Karpet()
+    print(k.get_quick_search_data()[0])
+    {
+        "name": "Bitcoin",
+        "symbol": "BTC",
+        "rank": 1,
+        "slug": "bitcoin",
+        "tokens": [
+            "Bitcoin",
+            "bitcoin",
+            "BTC"
+        ],
+        "id": 1,
+    }
 
 Changelog
 ---------
+
+0.4.6
+~~~~~
+- new ``price_change_24`` and ``price_change_24_percents`` properties for ``get_basic_data()``
+- new ``get_quick_search_data()``
 
 0.4.5
 ~~~~~
