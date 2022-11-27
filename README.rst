@@ -223,6 +223,12 @@ Lists all coins/tokes with some basic info.
 Changelog
 ---------
 
+0.4.7.
+~~~~~~
+- dependencies updated
+- news with non UTF-8 chars handled and dropped
+- fixed code formatting
+
 0.4.6
 ~~~~~
 - new ``price_change_24`` and ``price_change_24_percents`` properties for ``get_basic_data()``

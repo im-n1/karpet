@@ -101,7 +101,11 @@ class Karpet:
         # Fetch and check the response.
         data = self._get_json(url)
 
-        if "prices" not in data or "market_caps" not in data or "total_volumes" not in data:
+        if (
+            "prices" not in data
+            or "market_caps" not in data
+            or "total_volumes" not in data
+        ):
             raise Exception("Couldn't download necessary data from the internet.")
 
         # Assembly the dataframe.
@@ -109,10 +113,14 @@ class Karpet:
         prices = pd.Series(prices[:, 1], index=prices[:, 0], name="price")
 
         market_caps = np.array(data["market_caps"])
-        market_caps = pd.Series(market_caps[:, 1], index=market_caps[:, 0], name="market_cap")
+        market_caps = pd.Series(
+            market_caps[:, 1], index=market_caps[:, 0], name="market_cap"
+        )
 
         total_volumes = np.array(data["market_caps"])
-        total_volumes = pd.Series(total_volumes[:, 1], index=total_volumes[:, 0], name="total_volume")
+        total_volumes = pd.Series(
+            total_volumes[:, 1], index=total_volumes[:, 0], name="total_volume"
+        )
         df = pd.concat([prices, market_caps, total_volumes], axis=1)
         df.index = pd.to_datetime(df.index, unit="ms")
         df.index = df.index.normalize()
@@ -199,7 +207,11 @@ class Karpet:
 
         # Get the dates for each search.
         if n_days <= trdays:
-            trend_dates = ["{} {}".format(self.start.strftime("%Y-%m-%d"), self.end.strftime("%Y-%m-%d"))]
+            trend_dates = [
+                "{} {}".format(
+                    self.start.strftime("%Y-%m-%d"), self.end.strftime("%Y-%m-%d")
+                )
+            ]
         else:
             trend_dates = [
                 "{} {}".format(
@@ -210,7 +222,9 @@ class Karpet:
             ]
 
         # Try to fetch first batch.
-        pytrends.build_payload(kw_list, cat=cat, timeframe=trend_dates[0], geo=geo, gprop=gprop)
+        pytrends.build_payload(
+            kw_list, cat=cat, timeframe=trend_dates[0], geo=geo, gprop=gprop
+        )
         df = pytrends.interest_over_time().reset_index()
 
         if len(df) == 0:
@@ -220,7 +234,9 @@ class Karpet:
         for date in trend_dates[1:]:
 
             time.sleep(sleeptime)
-            pytrends.build_payload(kw_list, cat=cat, timeframe=date, geo=geo, gprop=gprop)
+            pytrends.build_payload(
+                kw_list, cat=cat, timeframe=date, geo=geo, gprop=gprop
+            )
 
             temp_trend = pytrends.interest_over_time().reset_index()
             temp_trend = temp_trend.merge(df, on="date", how="left")
@@ -228,12 +244,16 @@ class Karpet:
             # it's ugly but we'll exploit the common column names
             # and then rename the underscore containing column names
             for kw in kw_list:
-                norm_factor = np.ma.masked_invalid(temp_trend[kw + "_y"] / temp_trend[kw + "_x"]).mean()
+                norm_factor = np.ma.masked_invalid(
+                    temp_trend[kw + "_y"] / temp_trend[kw + "_x"]
+                ).mean()
                 temp_trend[kw] = temp_trend[kw + "_x"] * norm_factor
 
             temp_trend = temp_trend[temp_trend.isnull().any(axis=1)]
             temp_trend["isPartial"] = temp_trend["isPartial_x"]
-            df = pd.concat([df, temp_trend[["date", "isPartial"] + kw_list]], axis=0, sort=False)
+            df = pd.concat(
+                [df, temp_trend[["date", "isPartial"] + kw_list]], axis=0, sort=False
+            )
 
         # Reorder columns in alphabetical order.
         df = df[["date", "isPartial"] + kw_list]
@@ -275,7 +295,9 @@ class Karpet:
             :rtype: list
             """
 
-            url = f"https://coincodex.com/api/coincodexicos/get_news/{symbol}/{limit}/1/"
+            url = (
+                f"https://coincodex.com/api/coincodexicos/get_news/{symbol}/{limit}/1/"
+            )
             data = self._get_json(url)
 
             return [{"url": d["url"]} for d in data]
@@ -334,7 +356,9 @@ class Karpet:
             :rtype: dict
             """
 
-            headers = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:69.0) Gecko/20100101 Firefox/69.0"}
+            headers = {
+                "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:69.0) Gecko/20100101 Firefox/69.0"
+            }
             response = requests.get("https://cointelegraph.com/", headers=headers)
             dom = BeautifulSoup(response.text, "lxml")
 
@@ -456,26 +480,43 @@ class Karpet:
             "current_price": data["market_data"]["current_price"]["usd"],
             "market_cap": data["market_data"]["market_cap"]["usd"],
             "rank": data["market_data"]["market_cap_rank"],
-            "reddit_average_posts_48h": data["community_data"]["reddit_average_comments_48h"],
-            "reddit_average_comments_48h": data["community_data"]["reddit_average_comments_48h"],
+            "reddit_average_posts_48h": data["community_data"][
+                "reddit_average_comments_48h"
+            ],
+            "reddit_average_comments_48h": data["community_data"][
+                "reddit_average_comments_48h"
+            ],
             "reddit_subscribers": data["community_data"]["reddit_subscribers"],
-            "reddit_accounts_active_48h": float(data["community_data"]["reddit_accounts_active_48h"] or 0),
+            "reddit_accounts_active_48h": float(
+                data["community_data"]["reddit_accounts_active_48h"] or 0
+            ),
             "forks": data["developer_data"]["forks"],
             "stars": data["developer_data"]["stars"],
             "total_issues": data["developer_data"]["total_issues"],
             "closed_issues": data["developer_data"]["closed_issues"],
-            "pull_request_contributors": data["developer_data"]["pull_request_contributors"],
+            "pull_request_contributors": data["developer_data"][
+                "pull_request_contributors"
+            ],
             "commit_count_4_weeks": data["developer_data"]["commit_count_4_weeks"],
             "year_low": sorted_chart_by_price[0][1],
             "year_high": sorted_chart_by_price[-1][1],
-            "yoy_change": 100 * (sorted_chart_by_date[-1][1] / sorted_chart_by_date[0][1] - 1),
+            "yoy_change": 100
+            * (sorted_chart_by_date[-1][1] / sorted_chart_by_date[0][1] - 1),
             "price_change_24": data["market_data"]["price_change_24h"],
-            "price_change_24_percents": data["market_data"]["price_change_percentage_24h"],
+            "price_change_24_percents": data["market_data"][
+                "price_change_percentage_24h"
+            ],
         }
 
         # Calculate open issues.
-        if data["developer_data"]["total_issues"] and data["developer_data"]["closed_issues"]:
-            to_return["open_issues"] = data["developer_data"]["total_issues"] - data["developer_data"]["closed_issues"]
+        if (
+            data["developer_data"]["total_issues"]
+            and data["developer_data"]["closed_issues"]
+        ):
+            to_return["open_issues"] = (
+                data["developer_data"]["total_issues"]
+                - data["developer_data"]["closed_issues"]
+            )
         else:
             to_return["open_issues"] = None
 
@@ -520,29 +561,37 @@ class Karpet:
 
                     # Title.
                     try:
-                        news["title"] = dom.find("meta", {"property": "og:title"})["content"]
+                        news["title"] = dom.find("meta", {"property": "og:title"})[
+                            "content"
+                        ]
                     except:
                         news["title"] = None
 
                     # Date.
                     try:
-                        d = dom.find("meta", {"property": "article:published_time"})["content"]
+                        d = dom.find("meta", {"property": "article:published_time"})[
+                            "content"
+                        ]
                         news["date"] = datetime.strptime(d, "%Y-%m-%dT%H:%M:%S%z")
                     except:
                         news["date"] = None
 
                     # Image.
                     try:
-                        news["image"] = dom.find("meta", {"property": "og:image"})["content"]
+                        news["image"] = dom.find("meta", {"property": "og:image"})[
+                            "content"
+                        ]
                     except:
                         news["image"] = None
 
                     # Description.
                     try:
-                        news["description"] = dom.find("meta", {"property": "og:description"})["content"]
+                        news["description"] = dom.find(
+                            "meta", {"property": "og:description"}
+                        )["content"]
                     except:
                         news["description"] = None
-            except aiohttp.ClientResponseError:
+            except (aiohttp.ClientResponseError, UnicodeDecodeError):
                 pass
 
         async with aiohttp.ClientSession() as session:
@@ -614,6 +663,8 @@ class Karpet:
         ids = self.get_coin_ids(symbol)
 
         if 1 < len(ids):
-            raise Exception(f'Symbol is common for {len(ids)} coins. Please specify "id" param instead.')
+            raise Exception(
+                f'Symbol is common for {len(ids)} coins. Please specify "id" param instead.'
+            )
 
         return ids[0]
