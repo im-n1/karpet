@@ -59,7 +59,7 @@ Retrieves historical data.
 .. code-block:: python
 
     k = Karpet(date(2019, 1, 1), date(2019, 5, 1))
-    df = k.fetch_crypto_historical_data(symbol="ETH")  # Dataframe with historical data.
+    df = k.fetch_crypto_historical_data(id="ethereum")  # Dataframe with historical data.
     df.head()
 
                      price   market_cap total_volume
@@ -220,8 +220,29 @@ Lists all coins/tokes with some basic info.
         "id": 1,
     }
 
+fetch_crypto_live_data()
+~~~~~~~~~~~~~~~~~~~~~~~~
+Retrieves live market data.
+
+.. code-block:: python
+
+    k = Karpet()
+    df = k.fetch_crypto_live_data(id="ethereum")  # Dataframe with live data.
+    df.head()
+
+                            open     high      low    close
+    2023-01-16 20:00:00  1593.01  1595.05  1593.01  1594.28
+    2023-01-16 20:30:00  1593.37  1593.37  1589.03  1589.35
+    2023-01-16 21:00:00  1592.68  1593.66  1584.71  1587.87
+    2023-01-16 21:30:00  1587.28  1587.28  1583.13  1583.13
+    2023-01-16 22:00:00  1573.99  1580.11  1573.99  1579.97
+
 Changelog
 ---------
+
+0.4.8
+~~~~~
+- new ``fetch_crypto_live_data()``
 
 0.4.7.
 ~~~~~~

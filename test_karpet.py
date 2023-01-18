@@ -130,3 +130,12 @@ def test_get_coin_ids():
 
     k = Karpet()
     assert k.get_coin_ids("BTC") == ["bitcoin"]
+
+
+def test_fetch_crypto_live_data():
+
+    k = Karpet()
+    df = k.fetch_crypto_live_data(id="ethereum")
+
+    assert 0 < len(df)
+    assert list(df.columns) == ["open", "high", "low", "close"]

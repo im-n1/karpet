@@ -74,7 +74,8 @@ class Karpet:
 
     def fetch_crypto_historical_data(self, symbol=None, id=None):
         """
-        Retrieve basic historical information for a specific cryptocurrency from coingecko.com.
+        Retrieve basic historical information (by days) for a specific
+        cryptocurrency from coingecko.com.
         Coin ID can be retreived by get_coin_ids() method.
 
         Output dataframe has following columns:
@@ -86,7 +87,7 @@ class Karpet:
         Index is datetime64[ns].
 
         :param str symbol: Coin symbol - i.e. BTC, ETH, ...
-        :param str id: Coin ID (baed on coingecko.com).
+        :param str id: Coin ID (based on coingecko.com).
         :raises Exception: If data couldn't be download form the internet.
         :return: Dataframe with historical data.
         :rtype: pd.DataFrame
@@ -133,6 +134,48 @@ class Karpet:
             df = df[df.index.date <= self.end]
 
         return df
+
+    def fetch_crypto_live_data(self, symbol=None, id=None):
+        """
+        Retrieve OHLC price data for past 24 hours for a specific
+        cryptocurrency from coingecko.com.
+        Coin ID can be retreived by get_coin_ids() method.
+
+        Output dataframe has following columns:
+
+        - open
+        - high
+        - low
+        - close
+
+        Index is datetime64[ns].
+
+        :param str symbol: Coin symbol - i.e. BTC, ETH, ...
+        :param str id: Coin ID (based on coingecko.com).
+        :raises Exception: If data couldn't be download form the internet.
+        :return: Dataframe with OHLC data.
+        :rtype: pd.DataFrame
+        """
+
+        id = self._get_coin_id_from_params(symbol, id)
+
+        # Fetch data.
+        data = []
+        url = f"https://api.coingecko.com/api/v3/coins/{id}/ohlc?vs_currency=usd&days=1"
+
+        # Fetch and check the response.
+        data = self._get_json(url)
+
+        if not data:
+            raise Exception("Couldn't download necessary data from the internet.")
+
+        # Assembly the dataframe.
+        data = np.array(data)
+        return pd.DataFrame.from_records(
+            data[:, 1:],
+            index=pd.to_datetime(data[:, 0], unit="ms"),
+            columns=["open", "high", "low", "close"],
+        )
 
     def fetch_crypto_exchanges(self, symbol=None):
         """
