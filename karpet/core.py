@@ -5,18 +5,21 @@ except:
 
 import asyncio
 import time
-from datetime import date, datetime, timedelta
+from datetime import datetime, timedelta
 
 import aiohttp
 import numpy as np
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
+from requests.adapters import HTTPAdapter, Retry
 
 
 class Karpet:
 
     quick_search_data = None
+    req_retries = 4
+    req_backoff_factor = 3
 
     def __init__(self, start=None, end=None):
         """
@@ -28,6 +31,28 @@ class Karpet:
 
         self.start = start
         self.end = end
+        self.req_ses = self.get_session()
+
+    def get_session(self):
+
+        # Waits for 1.5s, 3s, 6s, 12s, 24s between requests.
+        status_forcelist = (500, 502, 503, 504, 429)
+
+        retry = Retry(
+            total=self.req_retries,
+            read=self.req_retries,
+            connect=self.req_retries,
+            backoff_factor=self.req_backoff_factor,
+            status_forcelist=status_forcelist,
+            method_whitelist=False,
+        )
+        adapter = HTTPAdapter(max_retries=retry)
+
+        session = requests.Session()
+        # session.mount("http://", adapter)
+        session.mount("https://", adapter)
+
+        return session
 
     def get_quick_search_data(self):
         """
@@ -53,24 +78,12 @@ class Karpet:
         :rtype: list
         """
 
-        if self.quick_search_data:
-            return self.quick_search_data
+        if not self.quick_search_data:
+            self.quick_search_data = self._get_json(
+                "https://s2.coinmarketcap.com/generated/search/quick_search.json"
+            )
 
-        url = "https://s2.coinmarketcap.com/generated/search/quick_search.json"
-
-        # Download.
-        try:
-            response = requests.get(url)
-        except:
-            raise Exception("Couldn't download necessary data from the internet.")
-
-        # Parse.
-        try:
-            self.quick_search_data = response.json()
-
-            return self.quick_search_data
-        except:
-            raise Exception("Couldn't parse downloaded data from the internet.")
+        return self.quick_search_data
 
     def fetch_crypto_historical_data(self, symbol=None, id=None):
         """
@@ -246,7 +259,12 @@ class Karpet:
 
         stich_overlap = trdays - overlap
         n_days = (self.end - self.start).days
-        pytrends = TrendReq(hl=hl, tz=tz)
+        pytrends = TrendReq(
+            hl=hl,
+            tz=tz,
+            retries=self.req_retries,
+            backoff_factor=self.req_backoff_factor,
+        )
 
         # Get the dates for each search.
         if n_days <= trdays:
@@ -402,7 +420,7 @@ class Karpet:
             headers = {
                 "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:69.0) Gecko/20100101 Firefox/69.0"
             }
-            response = requests.get("https://cointelegraph.com/", headers=headers)
+            response = self.req_ses.get("https://cointelegraph.com/", headers=headers)
             dom = BeautifulSoup(response.text, "lxml")
 
             def parse_news(news_items):
@@ -673,9 +691,11 @@ class Karpet:
 
         # Download.
         try:
-            response = requests.get(url)
+            response = self.req_ses.get(url)
         except:
             raise Exception("Couldn't download necessary data from the internet.")
+
+        response.raise_for_status()
 
         # Parse.
         try:

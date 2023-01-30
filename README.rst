@@ -240,6 +240,10 @@ Retrieves live market data.
 Changelog
 ---------
 
+0.4.9
+~~~~~
+- new retry policy
+
 0.4.8
 ~~~~~
 - new ``fetch_crypto_live_data()``
