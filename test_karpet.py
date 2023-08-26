@@ -8,19 +8,16 @@ CRYPTOCOMPARE_API_KEY = None
 
 
 def get_last_week():
-
     return date.today() - timedelta(days=13), date.today() - timedelta(days=7)
 
 
 def test_fetch_crypto_historical_data():
-
     c = Karpet()
 
     assert 1000 < len(c.fetch_crypto_historical_data(symbol="BTC"))
 
 
 def test_fetch_crypto_historical_data_params():
-
     c = Karpet()
 
     with pytest.raises(AttributeError):
@@ -31,14 +28,12 @@ def test_fetch_crypto_historical_data_params():
 
 
 def test_fetch_crypto_historical_data_limited():
-
     c = Karpet(date(2019, 1, 1), date(2019, 1, 30))
 
     assert 30 == len(c.fetch_crypto_historical_data(symbol="BTC"))
 
 
 def test_fetch_exchanges():
-
     c = Karpet()
     exchanges = c.fetch_crypto_exchanges("btc")
 
@@ -47,7 +42,6 @@ def test_fetch_exchanges():
 
 
 def test_fetch_google_trends():
-
     c = Karpet(*get_last_week())
     df = c.fetch_google_trends(kw_list=["bitcoin"])
 
@@ -56,7 +50,6 @@ def test_fetch_google_trends():
 
 
 def test_fetch_news():
-
     k = Karpet()
     news = k.fetch_news("eth")
 
@@ -70,7 +63,6 @@ def test_fetch_news():
 
 
 def test_fetch_news_with_limit():
-
     k = Karpet()
     news = k.fetch_news("eth", limit=30)
 
@@ -79,7 +71,6 @@ def test_fetch_news_with_limit():
 
 
 def test_fetch_top_news():
-
     k = Karpet()
     editors_choice, hot_stories = k.fetch_top_news()
 
@@ -101,10 +92,9 @@ def test_fetch_top_news():
         assert isinstance(hot_stories[0]["date"], datetime)
 
 
-def test_get_basic_data():
-
+def test_get_basic_info():
     k = Karpet()
-    data = k.get_basic_data(id="ethereum")
+    data = k.get_basic_info(id="ethereum")
 
     assert isinstance(data["name"], str)
     assert isinstance(data["current_price"], float)
@@ -127,13 +117,11 @@ def test_get_basic_data():
 
 
 def test_get_coin_ids():
-
     k = Karpet()
     assert k.get_coin_ids("BTC") == ["bitcoin"]
 
 
 def test_fetch_crypto_live_data():
-
     k = Karpet()
     df = k.fetch_crypto_live_data(id="ethereum")
 

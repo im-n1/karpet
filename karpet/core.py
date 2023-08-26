@@ -16,7 +16,6 @@ from requests.adapters import HTTPAdapter, Retry
 
 
 class Karpet:
-
     quick_search_data = None
     req_retries = 4
     req_backoff_factor = 3
@@ -34,7 +33,6 @@ class Karpet:
         self.req_ses = self.get_session()
 
     def get_session(self):
-
         # Waits for 1.5s, 3s, 6s, 12s, 24s between requests.
         status_forcelist = (500, 502, 503, 504, 429)
 
@@ -44,7 +42,7 @@ class Karpet:
             connect=self.req_retries,
             backoff_factor=self.req_backoff_factor,
             status_forcelist=status_forcelist,
-            method_whitelist=False,
+            # method_whitelist=False,
         )
         adapter = HTTPAdapter(max_retries=retry)
 
@@ -293,7 +291,6 @@ class Karpet:
 
         # Fetch other batches.
         for date in trend_dates[1:]:
-
             time.sleep(sleeptime)
             pytrends.build_payload(
                 kw_list, cat=cat, timeframe=date, geo=geo, gprop=gprop
@@ -435,14 +432,13 @@ class Karpet:
                 news = []
 
                 for i in news_items:
-
                     try:
                         href = i.find("a")["href"]
                     except AttributeError:
                         # A without href attribute.
                         continue
 
-                    if not href.startswith("https://") or not href.startswith("//"):
+                    if not href.startswith("https://"):
                         href = "https://cointelegraph.com" + href
 
                     news.append({"url": href})
@@ -489,7 +485,7 @@ class Karpet:
 
         return found_ids
 
-    def get_basic_data(self, symbol=None, id=None):
+    def get_basic_info(self, symbol=None, id=None):
         """
         Fetches coin/token basic data like:
 
@@ -616,7 +612,6 @@ class Karpet:
 
             try:
                 async with session.get(news["url"]) as response:
-
                     html = await response.text()
                     dom = BeautifulSoup(html, features="lxml")
 
