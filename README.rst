@@ -1,3 +1,10 @@
+WARNING
+=======
+
+Thanks to GitHub's hostile policy the repository has migrated to `Gitlab <https://gitlab.com/imn1/karpet>`_.
+
+This repository won't be updated anymore.
+
 .. image:: https://raw.githubusercontent.com/im-n1/karpet/master/assets/logo.png
    :align: center
 
